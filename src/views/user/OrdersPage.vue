@@ -48,7 +48,7 @@
         </div>
 
         <!-- Modal Chi Tiết Đơn Hàng -->
-        <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
+        <!-- <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
           <div class="modal-dialog modal-lg">
             <div class="modal-content">
               <div class="modal-header">
@@ -79,7 +79,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -91,7 +91,7 @@ import ProfileSideBar from "../../components/user/ProfileSideBar.vue";
 import { useOrderDetails } from "../../stores/useOrderDetailsStore.js";
 import { useOrder } from "../../stores/useOrderStore.js";
 const { orders, order, isOrdersLoading, ordersError, fetchOrderById, fetchOrderByUserId } = useOrder();
-const { isOrderDetailsLoading, orderDetailsList, orderDetails, orderDetailsError, fetchOrderDetailsList, fetchOrderDetailsByOrderId, fetchOrderDetailsByUserId } = useOrderDetails();
+const { orderDetails, fetchOrderDetailsByOrderId, fetchOrderDetailsByUserId } = useOrderDetails();
 const user = ref({});
 const selectedOrderId = ref(null);
 

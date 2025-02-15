@@ -2,8 +2,9 @@
   <div class="card product-card rounded-0 shadow-sm position-relative">
     <router-link :to="{ name: 'ProductDetail', params: { id: product.id } }">
       <!-- Sale Banner -->
-      <div v-if="product.discountPrice" class="sale-banner bg-danger text-white position-absolute top-50 text-center">
-        <img :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/q_auto/f_auto/w_200/v1737806064/SalePanelGif.gif'" class="object-fit-cover" alt="" />
+      <div v-if="product.discountPrice" class="sale-banner position-absolute text-center">
+        <img :src="'http://res.cloudinary.com/sof3022-image-cloudinary/image/upload/e_background_removal/v1739371531/sale-icon.png'" class="object-fit-cover img-fluid" alt="Sale" />
+        <span class="sale-text">Sale</span>
       </div>
 
       <!-- Product Image -->
@@ -32,7 +33,9 @@
         <i class="bi bi-bag-x-fill"></i>
         <!-- END OUT OF STOCK -->
       </button>
-      <ConfirmModal></ConfirmModal>
+      <teleport to="body">
+        <ConfirmModal></ConfirmModal>
+      </teleport>
     </div>
   </div>
 </template>
@@ -46,7 +49,7 @@ const modalStore = useModalStore();
 const result = ref(null);
 
 const showModal = async (name, price) => {
-  result.value = await modalStore.openModal("Bạn có muốn thêm <strong>" + name + "</strong> vào giỏ hàng?<br> Giá: <strong>" + price + "</strong> VNĐ");
+  result.value = await modalStore.openModal("Bạn có muốn thêm <strong>" + name + "</strong> vào giỏ hàng?<br> <p>Giá: <strong class='text-danger'>" + price + " </strong> VNĐ</p> ");
   if (result.value) {
     addToCart();
   }
@@ -91,12 +94,24 @@ const addToCart = () => {
 .sale-banner {
   position: absolute;
   top: 0;
-  left: 0;
-  width: 100%;
-  padding: 0.3rem;
-  font-size: 0.8rem;
+  left: 75%;
+  width: 50px;
+  height: 50px;
 }
-
+.sale-banner img {
+  width: 100%;
+  height: 100%;
+}
+.sale-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
 .card-title {
   font-size: 0.9rem;
   line-height: 1.2;

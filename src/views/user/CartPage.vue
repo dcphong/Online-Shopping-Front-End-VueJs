@@ -8,21 +8,31 @@
       <div class="col-1">Thao tác</div>
     </div>
 
-    <div class="">
-      <div class="row bg-white pt-2 pb-2 border-bottom text fw-normal">
-        <div class="col-10">Số lượng sản phẩm: {{ products.length }}</div>
-        <div class="col-2">
-          <button @click="removeAllProductsInCart()" class="w-100 border-0 bg-white text-decoration-underline rounded-0">Xóa hết sản phẩm</button>
-        </div>
+    <div class="row bg-white pt-2 pb-2 border-bottom text fw-normal">
+      <div class="col-10">Số lượng sản phẩm: {{ cart.items.length }}</div>
+      <div class="col-2">
+        <button @click="removeAllProductsInCart()" class="w-100 border-0 bg-white text-decoration-underline rounded-0">Xóa hết sản phẩm</button>
       </div>
+    </div>
 
-      <div v-if="cart.items.length > 0">
-        <div v-for="product in cart.items" :key="product.id" class="row product-row p-2 text">
-          <div class="col-6 d-flex align-items-center" style="height: 80px">
+    <div v-if="cart.items.length > 0">
+      <div v-for="(group, sellerId) in groupedCartItems" :key="sellerId" class="mb-4">
+        <div class="row bg-light pt-2 pb-2 fw-bold border">
+          <div class="col-10">
+            🛍 Người bán: <span class="fw-normal">{{ group.fullname }}</span>
+          </div>
+          <div class="col-2 text-end">
+            <button @click="removeAllProductsBySeller(sellerId)" class="btn btn-outline-danger btn-sm rounded-0">Xóa toàn bộ</button>
+          </div>
+        </div>
+
+        <!-- Duyệt danh sách sản phẩm của người bán -->
+        <div v-for="product in group.products" :key="product.id" class="row product-row pt-2 pb-2 text">
+          <div class="col-6" style="height: 80px">
             <img
-              :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
+              :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/e_background_removal/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
               :alt="product.name"
-              class="w-25"
+              class="w-25 img-fluid"
             />
             <p>{{ product.name }}</p>
           </div>
@@ -33,11 +43,26 @@
             <button class="btn btn-outline-dark w-100 rounded-0" @click="removeProductInCart(product.id)">Xóa</button>
           </div>
         </div>
-      </div>
 
-      <div v-else>
-        <div class="row bg-white pt-2 pb-2 border-bottom text fw-normal">
-          <div class="col-12">Giỏ hàng trống</div>
+        <div class="row d-flex align-items-center justify-content-end bg-white pt-2 pb-2">
+          <div class="col-12">
+            <div class="w-50 float-end">
+              <button class="btn btn-outline-dark w-25 rounded-0 float-end" @click="sendProductsToPayment(group.products)">Mua</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-else>
+      <div class="row bg-white pt-2 pb-2 border-bottom text fw-normal">
+        <div class="col-12">🛒 Giỏ hàng trống</div>
+      </div>
+    </div>
+    <div class="row d-flex align-items-center justify-content-end bg-white pt-2 pb-2">
+      <div class="col-12">
+        <div class="w-50 float-end">
+          <button class="btn btn-outline-dark w-25 rounded-0 float-end" @click="sendProductsToPayment(cart.items)">Mua tất cả</button>
         </div>
       </div>
     </div>
@@ -47,10 +72,40 @@
 </template>
 
 <script setup>
-import { inject, onMounted, ref } from "vue";
+import { computed, ref } from "vue";
+import { useRouter } from "vue-router";
 import { useProductsInCart } from "../../composables/useProductInCart.js";
+import { useCartStore } from "../../stores/cartStore.js";
 
-const { products, loading, error, removeProductInCart, removeAllProductsInCart, cart } = useProductsInCart();
+const router = useRouter();
+const { setSelectedProducts } = useCartStore();
+const { loading, error, removeProductInCart, removeAllProductsInCart, cart } = useProductsInCart();
+
+const groupedCartItems = computed(() => {
+  return cart.items.reduce((groups, product) => {
+    const sellerId = product.createdBy;
+    const salerFullname = product.userCreatedName;
+    if (!groups[sellerId]) {
+      groups[sellerId] = {
+        sellerId: sellerId,
+        fullname: salerFullname,
+        products: [],
+      };
+    }
+    groups[sellerId].products.push(product);
+    return groups;
+  }, {});
+});
+const removeAllProductsBySeller = (sellerId) => {
+  cart.items = cart.items.filter((product) => product.createdBy !== sellerId);
+};
+
+const sendProductsToPayment = (products) => {
+  const productsInLocal = JSON.parse(localStorage.getItem("cart")) || [];
+  const selectedProducts = productsInLocal.filter((product) => products.some((p) => p.id === product.id));
+  setSelectedProducts(selectedProducts);
+  router.push("/user/payment");
+};
 </script>
 <style scoped>
 img {

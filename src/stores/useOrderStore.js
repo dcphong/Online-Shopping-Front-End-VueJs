@@ -1,7 +1,7 @@
 import { ref } from "vue";
 export const useOrder = () => {
   const orders = ref([]);
-  const order = ref({});
+  const orderStore = ref({});
   const isOrdersLoading = ref(false);
   const ordersError = ref(null);
 
@@ -80,5 +80,31 @@ export const useOrder = () => {
     }
   };
 
-  return { orders, order, isOrdersLoading, ordersError, fetchOrders, fetchOrderById, fetchOrderByUserId };
+  const createdOrder = async (order) => {
+    isOrdersLoading.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/user/orders`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(order),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to create order: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      return data.data;
+    } catch (err) {
+      throw err;
+    } finally {
+      isOrdersLoading.value = false;
+    }
+  };
+
+  return { orders, orderStore, isOrdersLoading, ordersError, fetchOrders, fetchOrderById, fetchOrderByUserId, createdOrder };
 };

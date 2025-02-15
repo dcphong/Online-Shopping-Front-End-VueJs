@@ -39,7 +39,7 @@ const userRoutes = {
       component: () => import("../views/user/SearchPage.vue"),
     },
     {
-      path: "user/payment/:id",
+      path: "user/payment",
       name: "UserPayment",
       component: () => import("../views/user/PaymentDetailsPage.vue"),
     },
