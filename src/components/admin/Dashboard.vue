@@ -293,17 +293,17 @@ import { useUsersStore } from "../../stores/usersStore.js";
 const { isRoleAdmin, isRoleUser } = useAuthStore();
 
 const useProductsStore = useProducts();
-const { products, loading, error, fetchProducts } = storeToRefs(useProductsStore);
+const { products, loading, error, fetchProductByUserId } = storeToRefs(useProductsStore);
 const useUsersStores = useUsersStore();
 const { isLoading, users, fetchAllUsers, fetchUserById } = storeToRefs(useUsersStores);
 
-const totalProducts = computed(() => useProductsStore.products.value);
+const totalProducts = computed(() => useProductsStore.products.length);
 const availableProducts = computed(() => products.value.filter((p) => p.available && p.stock_quantity > 0).length);
 const outOfStock = computed(() => products.value.filter((p) => p.stock_quantity <= 0).length);
 const discountedProducts = computed(() => products.value.filter((p) => p.discountPrice && p.discountPrice < p.price).length);
 
 onMounted(async () => {
-  await useProductsStore.fetchProducts();
+  await useProductsStore.fetchProductByUserId(JSON.parse(localStorage.getItem("user")).id);
   if (!users.length) {
     await useUsersStores.fetchAllUsers();
   }

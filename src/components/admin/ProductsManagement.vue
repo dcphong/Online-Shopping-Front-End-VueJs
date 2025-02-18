@@ -15,7 +15,7 @@
       </div>
 
       <div class="mb-1 float-end d-inline">
-        <button class="rounded-0 btn btn-success m-0" data-bs-toggle="modal" data-bs-target="#addProductModal">Tạo sản phẩm</button>
+        <button class="rounded-0 btn btn-success m-0" data-bs-toggle="modal" data-bs-target="#addProductModal" @click="openModal">Tạo sản phẩm</button>
       </div>
     </div>
 
@@ -34,7 +34,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in visibleProducts" :key="product.id">
+        <tr v-for="product in products" :key="product.id">
           <td>{{ product.id }}</td>
           <td>{{ product.name }}</td>
           <td>${{ product.price }}</td>
@@ -46,14 +46,6 @@
           <td>
             <button class="btn btn-warning btn-sm me-2">Sửa</button>
             <button class="btn btn-danger btn-sm">Xóa</button>
-          </td>
-        </tr>
-        <tr>
-          <td colspan="8">
-            <div class="d-flex justify-content-center gap-2">
-              <button class="border-0 w-100 rounded-0 btn-info btn text-light fs-5" :class="visibleProducts.value <= 0 ? 'disabled' : ''" @click="prevProductsList()">Trở lại</button>
-              <button class="border-0 rounded-0 w-100 btn-info btn text-light fs-5" :disabled="!hasMoreProducts" @click="nextProductList()">Xem thêm</button>
-            </div>
           </td>
         </tr>
       </tbody>
@@ -144,100 +136,35 @@
 </template>
 <script setup>
 import moment from "moment";
+import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 import { useProducts } from "../../composables/useProducts";
+import { useCategoryStore } from "../../stores/categoryStore";
 
-const { products, loading, error, fetchProducts, addProduct } = useProducts();
+const useCategoryStores = useCategoryStore();
+const { categories, fetchCategories } = storeToRefs(useCategoryStores);
 
-const visibleCount = ref(5);
-const visibleFirstCount = ref(0);
-const visibleProducts = computed(() => products.value.slice(visibleFirstCount.value, visibleCount.value));
-const hasMoreProducts = computed(() => {
-  return visibleCount.value < products.value.length;
-});
-
-const categories = ref([
-  { id: "1", name: "Electronics" },
-  { id: "2", name: "Clothing" },
-  { id: "3", name: "Shoes" },
-]);
+const useProductsStore = useProducts();
+const { products, loading, error, fetchProductByUserId } = storeToRefs(useProductsStore);
 
 const newProduct = ref({
   name: "",
   price: 0,
-  discountPrice: null,
+  discountPrice: 0,
   stock_quantity: 0,
-  available: "true",
+  available: true,
   image: null,
-  categoryId: "",
   descriptions: "",
+  categoryId: 1,
 });
-
-const imagePreview = ref(null);
-
-const handleFileUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    newProduct.value.image = file;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      imagePreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  }
-};
-
-const submitProduct = async () => {
-  const formData = new FormData();
-  formData.append("name", newProduct.value.name);
-  formData.append("price", newProduct.value.price);
-  formData.append("discountPrice", newProduct.value.discountPrice || 0);
-  formData.append("stock_quantity", newProduct.value.stock_quantity);
-  formData.append("available", newProduct.value.available === "true");
-  formData.append("categoryId", newProduct.value.categoryId);
-  formData.append("descriptions", newProduct.value.descriptions);
-  if (newProduct.value.image) {
-    formData.append("image", newProduct.value.image);
-  }
-
-  await addProduct(formData);
-  newProduct.value = {
-    name: "",
-    price: 0,
-    discountPrice: null,
-    stock_quantity: 0,
-    available: "true",
-    image: null,
-    categoryId: "",
-    descriptions: "",
-  };
-  imagePreview.value = null;
-  fetchProducts();
-
-  document.getElementById("addProductModal").classList.remove("show");
-  document.body.classList.remove("modal-open");
-  document.querySelector(".modal-backdrop").remove();
-};
-
-const nextProductList = () => {
-  if (hasMoreProducts.value) {
-    visibleCount.value += 5;
-    visibleFirstCount.value += 5;
-  }
-};
-
-const prevProductsList = () => {
-  if (visibleFirstCount.value > 0) {
-    visibleFirstCount.value -= 5;
-    visibleCount.value -= 5;
-  }
-};
 
 const formatDate = (date) => {
   return moment(date).format("DD/MM/YYYY");
 };
-
+const openModal = async () => {
+  await useCategoryStores.fetchCategories();
+};
 onMounted(async () => {
-  await fetchProducts();
+  await useProductsStore.fetchProductByUserId(JSON.parse(localStorage.getItem("user")).id);
 });
 </script>
