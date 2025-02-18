@@ -176,130 +176,136 @@
         </div>
       </div>
     </div>
-
-    <div class="card mt-3">
-      <div class="card-header">Danh Sách Người dùng</div>
-      <div class="card-body">
-        <table class="table table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>ID</th>
-              <th>AVATAR</th>
-              <th>USERNAME</th>
-              <th>FULLNAME</th>
-              <th>SĐT</th>
-              <th>EMAIL</th>
-              <th>VAI TRÒ</th>
-              <th>TRẠNG THÁI</th>
-            </tr>
-          </thead>
-          <tbody>
-            <template v-if="isLoading">
-              <tr v-for="n in 5" :key="n">
-                <td>
-                  <span class="placeholder col-6"></span>
-                </td>
-                <td>
-                  <span class="d-block rounded bg-secondary placeholder-wave" style="width: 50px; height: 50px"></span>
-                </td>
-                <td>
-                  <span class="placeholder col-8"></span>
-                </td>
-                <td>
-                  <span class="placeholder col-6"></span>
-                </td>
-                <td>
-                  <span class="placeholder col-6"></span>
-                </td>
-                <td>
-                  <span class="placeholder col-4"></span>
-                </td>
-                <td>
-                  <span class="placeholder col-4"></span>
-                </td>
-                <td>
-                  <span class="placeholder col-7"></span>
-                </td>
-              </tr>
-            </template>
-
-            <template v-else-if="!users">
+    <template v-if="isRoleAdmin">
+      <div class="card mt-3">
+        <div class="card-header">Danh Sách Người dùng</div>
+        <div class="card-body">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
               <tr>
-                <td colspan="8" class="text-center text-warning fw-bold">EMPTY DATA</td>
+                <th>ID</th>
+                <th>AVATAR</th>
+                <th>USERNAME</th>
+                <th>FULLNAME</th>
+                <th>SĐT</th>
+                <th>EMAIL</th>
+                <th>VAI TRÒ</th>
+                <th>TRẠNG THÁI</th>
               </tr>
-            </template>
-            <template v-else>
-              <tr v-for="user in users.slice(0, 5)" :key="user.id">
-                <td>{{ user.id }}</td>
-                <td>
-                  <img
-                    :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1738852593/0GYFgvj_t6yp1z.jpg'"
-                    alt="User Image"
-                    class="rounded-circle"
-                    style="width: 50px; height: 50px"
-                  />
-                </td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.fullName }}</td>
-                <td>{{ user.phone }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.roles.includes("ROLE_USER") ? "Khách hàng" : user.roles.includes("ROLE_ADMIN") ? "Quản Trị" : "Quản Lý" }}</td>
-                <td>{{ user.available ? "Hoạt động" : "Khóa" }}</td>
-              </tr>
-            </template>
-          </tbody>
-        </table>
-        <div class="d-flex justify-content-center">
-          <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-              <li class="page-item disabled">
-                <a class="page-link">
-                  <i class="bi bi-rewind-fill"></i>
-                </a>
-              </li>
-              <li class="page-item">
-                <a class="page-link">
-                  <i class="bi bi-caret-left-fill"></i>
-                </a>
-              </li>
-              <li class="page-item"><a class="page-link" href="#">1</a></li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="bi bi-caret-right-fill"></i>
-                </a>
-              </li>
-              <li class="page-item">
-                <a class="page-link" href="#">
-                  <i class="bi bi-fast-forward-fill"></i>
-                </a>
-              </li>
-            </ul>
-          </nav>
+            </thead>
+            <tbody>
+              <template v-if="isLoading">
+                <tr v-for="n in 5" :key="n">
+                  <td>
+                    <span class="placeholder col-6"></span>
+                  </td>
+                  <td>
+                    <span class="d-block rounded bg-secondary placeholder-wave" style="width: 50px; height: 50px"></span>
+                  </td>
+                  <td>
+                    <span class="placeholder col-8"></span>
+                  </td>
+                  <td>
+                    <span class="placeholder col-6"></span>
+                  </td>
+                  <td>
+                    <span class="placeholder col-6"></span>
+                  </td>
+                  <td>
+                    <span class="placeholder col-4"></span>
+                  </td>
+                  <td>
+                    <span class="placeholder col-4"></span>
+                  </td>
+                  <td>
+                    <span class="placeholder col-7"></span>
+                  </td>
+                </tr>
+              </template>
+
+              <template v-else-if="!users">
+                <tr>
+                  <td colspan="8" class="text-center text-warning fw-bold">EMPTY DATA</td>
+                </tr>
+              </template>
+              <template v-else>
+                <tr v-for="user in users" :key="user.id">
+                  <td>{{ user.id }}</td>
+                  <td>
+                    <img
+                      :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1738852593/0GYFgvj_t6yp1z.jpg'"
+                      alt="User Image"
+                      class="rounded-circle"
+                      style="width: 50px; height: 50px"
+                    />
+                  </td>
+                  <td>{{ user.username }}</td>
+                  <td>{{ user.fullName }}</td>
+                  <td>{{ user.phone }}</td>
+                  <td>{{ user.email }}</td>
+                  <td>{{ user.roles.includes("ROLE_USER") ? "Khách hàng" : user.roles.includes("ROLE_ADMIN") ? "Quản Trị" : "Quản Lý" }}</td>
+                  <td>{{ user.available ? "Hoạt động" : "Khóa" }}</td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+          <div class="d-flex justify-content-center">
+            <nav aria-label="Page navigation example">
+              <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                  <a class="page-link">
+                    <i class="bi bi-rewind-fill"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link">
+                    <i class="bi bi-caret-left-fill"></i>
+                  </a>
+                </li>
+                <li class="page-item"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                  <a class="page-link" href="#">
+                    <i class="bi bi-caret-right-fill"></i>
+                  </a>
+                </li>
+                <li class="page-item">
+                  <a class="page-link" href="#">
+                    <i class="bi bi-fast-forward-fill"></i>
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
-    </div>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from "vue";
-import { useProducts } from "../../composables/useProducts";
-import { useUsersStore } from "../../stores/usersStore";
+import { storeToRefs } from "pinia";
+import { computed, onMounted, ref } from "vue";
+import { useProducts } from "../../composables/useProducts.js";
+import { useAuthStore } from "../../stores/authStore.js";
+import { useUsersStore } from "../../stores/usersStore.js";
+const { isRoleAdmin, isRoleUser } = useAuthStore();
 
-const { products, loading, error, fetchProducts } = useProducts();
-const { isLoading, users, fetchAllUsers, fetchUserById } = useUsersStore();
+const useProductsStore = useProducts();
+const { products, loading, error, fetchProducts } = storeToRefs(useProductsStore);
+const useUsersStores = useUsersStore();
+const { isLoading, users, fetchAllUsers, fetchUserById } = storeToRefs(useUsersStores);
 
-const totalProducts = computed(() => products.value.length);
+const totalProducts = computed(() => useProductsStore.products.value);
 const availableProducts = computed(() => products.value.filter((p) => p.available && p.stock_quantity > 0).length);
 const outOfStock = computed(() => products.value.filter((p) => p.stock_quantity <= 0).length);
 const discountedProducts = computed(() => products.value.filter((p) => p.discountPrice && p.discountPrice < p.price).length);
 
 onMounted(async () => {
-  await fetchProducts();
+  await useProductsStore.fetchProducts();
   if (!users.length) {
-    await fetchAllUsers();
+    await useUsersStores.fetchAllUsers();
   }
 });
 </script>

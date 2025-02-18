@@ -41,7 +41,7 @@
 
       <div class="row w-100 mt-2 mb-2 text fw-lighter">
         <!-- LIST PRODUCT BY USERID -->
-        <div v-if="selectedProducts.length > 0" class="col-12 text p-2">
+        <div v-if="selectedProducts" class="col-12 text p-2">
           <div v-for="(groups, sellerId) in groupedProductsBySaler" :key="sellerId">
             <div class="row bg-light mb-3">
               <div class="row d-flex align-items-center pt-2 pb-2" v-for="product in groups.products" :key="product.id">
@@ -54,8 +54,8 @@
                   <p>{{ product.name }}</p>
                 </div>
                 <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price }} VNĐ</div>
-                <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product.quantity }}</div>
-                <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price * product.quantity }} VNĐ</div>
+                <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product?.quantity || 1 }}</div>
+                <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price * product?.quantity || product.price * 1 }} VNĐ</div>
               </div>
 
               <div class="row border m-0">
@@ -81,8 +81,8 @@
                 <div class="row m-0">
                   <div class="d-flex justify-content-end p-4">
                     <span class="fw-bold"
-                      >Tống: <b class="fw-normal fs-6 text-danger">{{ formatNumber(shippingFee + groups.totalPrice) + " VNĐ" }}</b></span
-                    >
+                      >Tống: <b class="fw-normal fs-6 text-danger">{{ formatNumber(shippingFee + groups?.totalPrice || totalPrice) + " VNĐ" }}</b>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -187,9 +187,13 @@ const groupedProductsBySaler = computed(() => {
 });
 
 const totalProductPrice = computed(() => {
-  return Object.values(groupedProductsBySaler.value).reduce((sum, group) => sum + group.totalPrice, 0);
+  if (selectedProducts.length < 1) {
+    return selectedProducts.reduce((sum, product) => sum + product.price * 1, 0);
+  }
+  return Object.values(groupedProductsBySaler.value).reduce((sum, group) => sum + group?.totalPrice, 0);
 });
 const totalShippingFee = computed(() => {
+  if (selectedProducts.length < 1) return shippingFee.value;
   return Object.keys(groupedProductsBySaler.value).length * shippingFee.value;
 });
 
@@ -218,9 +222,9 @@ const doOrder = async () => {
       throw new Error("Order creation failed.");
     }
     const updatedOrderDetailsList = selectedProducts.map((product) => ({
-      quantity: product.quantity,
+      quantity: product.quantity || 1,
       price: product.price,
-      total: (product.price * product.quantity).toFixed(2),
+      total: Number(product.price) * (product.quantity || 1),
       descriptions: descriptionsForSeller.value[product.createdBy] || "",
       productId: product.id,
       orderId: newOrder.id,

@@ -58,6 +58,7 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
 import { onMounted, ref } from "vue";
 import ProductCard from "../../components/user/ProductCard.vue";
 import Slider from "../../components/user/Slider.vue";
@@ -65,14 +66,15 @@ import Toasts from "../../components/user/Toasts.vue";
 import { useProductsInCart } from "../../composables/useProductInCart.js";
 import { useProducts } from "../../composables/useProducts.js";
 
-const { products, loading, error, fetchProducts, getProductsByCategoryName } = useProducts();
+const useProductStore = useProducts();
+const { products, loading, error, fetchProducts, getProductsByCategoryName } = storeToRefs(useProductStore);
 const { addToCart } = useProductsInCart();
 
 const productElectronics = ref(null);
 
 onMounted(async () => {
-  await fetchProducts();
-  productElectronics.value = getProductsByCategoryName("Electronics");
+  await useProductStore.fetchProducts();
+  productElectronics.value = useProductStore.getProductsByCategoryName("Electronics");
 });
 
 const showToast = ref(false);

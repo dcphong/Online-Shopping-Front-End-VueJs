@@ -40,9 +40,7 @@
                 {{ product.available ? "Còn hàng" : "Hết hàng" }}
               </p>
               <button :class="{ disabled: !product.available }" class="btn btn-primary w-50 rounded-0" @click="showModal(product)">{{ product.available ? "Thêm vào giỏ hàng" : "Hết hàng" }}</button>
-              <router-link :to="{ name: 'UserPayment', params: { id: product.id } }" v-if="product.available" class="btn btn-success ms-2 w-25 rounded-0">{{
-                product.available ? "Mua ngay" : "Hết hàng"
-              }}</router-link>
+              <button v-if="product.available" @click="buy(product)" class="btn btn-success ms-2 w-25 rounded-0">{{ product.available ? "Mua ngay" : "Hết hàng" }}</button>
             </div>
           </div>
         </div>
@@ -67,7 +65,7 @@
 <script setup>
 import moment from "moment";
 import { computed, onMounted, ref, watch } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import ConfirmModal from "../../components/user/ConfirmModal.vue";
 import Toasts from "../../components/user/Toasts.vue";
 import { useProductsInCart } from "../../composables/useProductInCart.js";
@@ -75,14 +73,24 @@ import { useProducts } from "../../composables/useProducts.js";
 import { useModalStore } from "../../stores/modalStore.js";
 import { useUsersStore } from "../../stores/usersStore.js";
 
+const { cart } = useProductsInCart();
+
+import { useCartStore } from "../../stores/cartStore.js";
+const useCartStores = useCartStore();
+const { setSelectedProducts } = storeToRefs(useCartStores);
+
 const { user, fetchUserById } = useUsersStore();
-const { loading, error, product, fetchProductById } = useProducts();
+
+import { storeToRefs } from "pinia";
+const useProductsStore = useProducts();
+const { loading, error, product, fetchProductById } = storeToRefs(useProductsStore);
 const { addToCart } = useProductsInCart();
 
 const dateAfterFormated = computed(() => {
-  return moment(product.createdDate).format("DD/MM/YYYY");
+  return moment(useProductsStore.product.createdDate).format("DD/MM/YYYY");
 });
 
+const router = useRouter();
 const route = useRoute();
 const sellerName = computed(() => user.value?.fullName || "Không xác định");
 
@@ -104,8 +112,18 @@ const handleAddToCart = (product) => {
   showToast.value = true;
 };
 
+const productSelected = ref([]);
+
+const buy = (product) => {
+  productSelected.value.push(product);
+  console.log("PRODUCT SELECTED: ", productSelected.value);
+  useCartStores.setSelectedProducts(productSelected.value);
+
+  router.push("/user/payment");
+};
+
 onMounted(async () => {
-  await fetchProductById(route.params.id);
+  await useProductsStore.fetchProductById(route.params.id);
   await fetchUserById(product.value.createdBy);
 });
 </script>

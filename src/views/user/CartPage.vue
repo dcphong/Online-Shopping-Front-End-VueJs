@@ -101,7 +101,7 @@ const removeAllProductsBySeller = (sellerId) => {
 };
 
 const sendProductsToPayment = (products) => {
-  const productsInLocal = JSON.parse(localStorage.getItem("cart")) || [];
+  const productsInLocal = JSON.parse(localStorage.getItem("cart")).items || [];
   const selectedProducts = productsInLocal.filter((product) => products.some((p) => p.id === product.id));
   setSelectedProducts(selectedProducts);
   router.push("/user/payment");

@@ -69,7 +69,6 @@ export const useOrder = () => {
       if (response.ok) {
         const data = await response.json();
         orders.value = data.data;
-        console.log("ORDERS: ", orders.value);
       } else {
         ordersError.value = "Failed to fetch order with user id: " + id + " from server";
       }
@@ -81,6 +80,7 @@ export const useOrder = () => {
   };
 
   const createdOrder = async (order) => {
+    console.log("ORDER: ", order);
     isOrdersLoading.value = true;
     try {
       const response = await fetch(`${apiUrl}/api/v1/user/orders`, {

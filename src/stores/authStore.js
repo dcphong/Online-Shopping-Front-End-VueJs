@@ -3,12 +3,15 @@ import { jwtDecode } from "jwt-decode";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useProductsInCart } from "../composables/useProductInCart";
 
 export const useAuthStore = defineStore("auth", () => {
+  const { cart } = useProductsInCart();
   const user = ref(null);
   const error = ref(null);
   const isLoading = ref(false);
   const accessToken = ref(localStorage.getItem("accessToken") || null);
+  const refreshToken = ref(localStorage.getItem("refreshToken") || null);
   const router = useRouter();
   const role = ref(null);
   const isRoleUser = ref(false);
@@ -17,11 +20,11 @@ export const useAuthStore = defineStore("auth", () => {
 
   const showNoPermission = ref(false);
   const noPermissionMessage = ref("");
-
+  const apiUrl = import.meta.env.VITE_API_BASE_URL;
   const login = async (username, password) => {
     try {
       isLoading.value = true;
-      const response = await fetch("http://localhost:8080/api/v1/auth/login", {
+      const response = await fetch(apiUrl + "/api/v1/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -36,6 +39,7 @@ export const useAuthStore = defineStore("auth", () => {
         const data = await response.json();
         accessToken.value = data.accessToken;
         localStorage.setItem("accessToken", data.accessToken);
+        localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.user));
         const savedUrl = router.currentRoute.value.query.redirect || "/";
         decodeUserRole();
@@ -51,14 +55,14 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
   const logout = () => {
-    localStorage.removeItem("cart");
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("cart");
+    localStorage.removeItem("orderDetails");
     localStorage.removeItem("user");
     user.value = null;
     accessToken.value = null;
     role.value = null;
     isRoleAdmin.value = false;
-    console.log("USER AFTER LOGOUT: ", user.value);
     isRoleUser.value = false;
     router.push("/auth/login");
   };
@@ -87,13 +91,35 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const isTokenValid = async (token) => {
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/auth/validateToken`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          accessToken: token,
+        }),
+      });
+
+      if (response.ok) {
+        console.log("IS VALID TOKEN: ", response.data);
+      }
+    } catch (err) {
+      error.value = err;
+    }
+  };
+
   const initAuth = () => {
     const userInLocal = JSON.parse(localStorage.getItem("user"));
+    isTokenValid(accessToken.value);
     if (userInLocal) {
       user.value = userInLocal;
       decodeUserRole();
     }
   };
+
   initAuth();
   return { accessToken, user, isRoleManager, error, isLoading, login, logout, isRoleAdmin, isRoleUser, decodeUserRole, showNoPermission, noPermissionMessage };
 });

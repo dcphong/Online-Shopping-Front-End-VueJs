@@ -3,18 +3,19 @@ import { defineStore } from "pinia";
 export const useCartStore = defineStore("cart", {
   state: () => ({
     selectedProducts: [],
+    selectedProduct: {},
   }),
   actions: {
     setSelectedProducts(products) {
       this.selectedProducts = products;
     },
     clearSelectedProducts() {
+      this.selectedProduct = {};
       this.selectedProducts = [];
     },
   },
-  returns: {
-    selectedProducts: (state) => state.selectedProducts,
-    setSelectedProducts: (state) => state.setSelectedProducts,
-    clearSelectedProducts: (state) => state.clearSelectedProducts,
+  getters: {
+    getSelectedProducts: (state) => state.selectedProducts, // Dùng getters thay vì "returns"
   },
+  persist: true,
 });

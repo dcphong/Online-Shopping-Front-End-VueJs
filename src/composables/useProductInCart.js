@@ -1,7 +1,7 @@
 import { computed, reactive, ref } from "vue";
 
 const cart = reactive({
-  items: JSON.parse(localStorage.getItem("cart")) || [],
+  items: JSON.parse(localStorage.getItem("cart"))?.items || [],
 });
 
 const productsInCartNumber = computed(() => {
@@ -15,7 +15,7 @@ const addToCart = (product) => {
   } else {
     cart.items.push({ ...product, quantity: 1 });
   }
-  localStorage.setItem("cart", JSON.stringify(cart.items));
+  localStorage.setItem("cart", JSON.stringify(cart));
 };
 
 export const useProductsInCart = () => {

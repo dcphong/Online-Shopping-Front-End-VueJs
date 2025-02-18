@@ -9,7 +9,9 @@
       <!-- Profile Form -->
       <div class="col-md-9 border-0 p-0">
         <div class="card border-start shadow-sm p-4 rounded-0 border-0">
-          <h4>Hồ Sơ Của {{ user.fullName }}</h4>
+          <h4>
+            Hồ Sơ Của: <span class="fs-3 fw-bold">{{ user.fullName }}</span>
+          </h4>
           <p class="text-muted">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
 
           <div class="row">

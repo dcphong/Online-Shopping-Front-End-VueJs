@@ -37,7 +37,7 @@
                       </span>
                     </td>
                     <td>
-                      <button class="btn btn-info btn-sm" @click="fetchOrderDetails(order.id)">Xem chi tiết</button>
+                      <button type="button" class="btn btn-info btn-sm" @click="fetchOrderDetails(order.id)" data-bs-toggle="modal" data-bs-target="#detailsModal">Xem chi tiết</button>
                     </td>
                   </tr>
                 </tbody>
@@ -48,71 +48,78 @@
         </div>
 
         <!-- Modal Chi Tiết Đơn Hàng -->
-        <!-- <div class="modal fade" id="orderDetailsModal" tabindex="-1" aria-labelledby="orderDetailsModalLabel" aria-hidden="true">
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title">Chi tiết đơn hàng #{{ selectedOrderId }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <table class="table table-bordered">
-                  <thead class="table-light">
-                    <tr>
-                      <th>#</th>
-                      <th>Sản phẩm</th>
-                      <th>Số lượng</th>
-                      <th>Giá</th>
-                      <th>Tổng</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="(detail, index) in fetchOrderDetailsList" :key="detail.id">
-                      <td>{{ index + 1 }}</td>
-                      <td>{{ detail.descriptions }}</td>
-                      <td>{{ detail.quantity }}</td>
-                      <td>{{ formatPrice(detail.price) }}</td>
-                      <td>{{ formatPrice(detail.total) }}</td>
-                    </tr>
-                  </tbody>
-                </table>
+        <teleport to="body"
+          ><div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="detailsModalLabel">Chi tiết đơn hàng</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <table class="table table-bordered">
+                    <thead class="table-light">
+                      <tr>
+                        <th>#</th>
+                        <th>Sản phẩm</th>
+                        <th>Số lượng</th>
+                        <th>Giá</th>
+                        <th>Tổng</th>
+                      </tr>
+                    </thead>
+                    <tbody v-if="orderDetails.length > 0">
+                      <tr v-for="(detail, index) in orderDetails" :key="detail.id">
+                        <td>{{ index + 1 }}</td>
+                        <td>{{ detail.descriptions }}</td>
+                        <td>{{ detail.quantity }}</td>
+                        <td>{{ formatPrice(detail.price) }}</td>
+                        <td>{{ formatPrice(detail.total) }}</td>
+                      </tr>
+                    </tbody>
+                    <tbody v-else>
+                      <tr>
+                        <td colspan="5" class="text-center text-danger">Chưa có chi tiết đơn hàng.</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           </div>
-        </div> -->
+        </teleport>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { storeToRefs } from "pinia";
+import { nextTick, onMounted, ref, toRaw, watch } from "vue";
 import ProfileSideBar from "../../components/user/ProfileSideBar.vue";
 import { useOrderDetails } from "../../stores/useOrderDetailsStore.js";
 import { useOrder } from "../../stores/useOrderStore.js";
-const { orders, order, isOrdersLoading, ordersError, fetchOrderById, fetchOrderByUserId } = useOrder();
-const { orderDetails, fetchOrderDetailsByOrderId, fetchOrderDetailsByUserId } = useOrderDetails();
-const user = ref({});
-const selectedOrderId = ref(null);
 
-// Format ngày tháng
+const { orders, order, isOrdersLoading, ordersError, fetchOrderById, fetchOrderByUserId } = useOrder();
+
+const orderDetailsStore = useOrderDetails();
+const { orderDetails, fetchOrderDetailsByOrderId } = storeToRefs(orderDetailsStore);
+const user = ref({});
+
 const formatDate = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString("vi-VN", { year: "numeric", month: "long", day: "numeric" });
 };
 
-// Format tiền tệ
 const formatPrice = (price) => {
   return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(price);
 };
 
-// Định dạng trạng thái đơn hàng
 const getStatusText = (status) => {
   const statusMap = {
     NOT_PAYMENT: "Chưa thanh toán",
-    PAID: "Đã thanh toán",
-    SHIPPED: "Đã giao hàng",
-    CANCELLED: "Đã hủy",
+    IS_PAYMENT: "Đã thanh toán",
+    IS_SHIPPED: "Đã giao hàng",
+    IS_CANCELLED: "Đã hủy",
   };
   return statusMap[status] || "Không xác định";
 };
@@ -121,10 +128,13 @@ const getStatusText = (status) => {
 const getStatusClass = (status) => {
   return {
     "badge bg-danger": status === "NOT_PAYMENT",
-    "badge bg-success": status === "PAID",
-    "badge bg-primary": status === "SHIPPED",
-    "badge bg-secondary": status === "CANCELLED",
+    "badge bg-success": status === "IS_PAYMENT",
+    "badge bg-primary": status === "IS_SHIPPED",
+    "badge bg-secondary": status === "IS_CANCELLED",
   };
+};
+const fetchOrderDetails = async (id) => {
+  await orderDetailsStore.fetchOrderDetailsByOrderId(id);
 };
 
 onMounted(async () => {
