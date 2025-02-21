@@ -124,5 +124,41 @@ export const useProducts = defineStore("products", () => {
     }
   };
 
-  return { products, product, loading, error, fetchProducts, fetchProductById, getProductsByCategoryName, fetchProductByUserId, addProduct, isAddProduct, productStoreMessage, updateProduct };
+  const deleteProduct = async (id) => {
+    loading.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/user/products/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        products.value = products.value.filter((product) => product.id !== id);
+      }
+    } catch (err) {
+      console.log("USE PRODUCT STORE ERROR: ", err.message);
+      productStoreMessage.value = "Xóa sản phẩm không thành công! Vui lòng thử lại sau!";
+    } finally {
+      loading.value = false;
+      productStoreMessage.value = "Xóa sản phẩm thành công!";
+    }
+  };
+
+  return {
+    products,
+    product,
+    loading,
+    error,
+    fetchProducts,
+    fetchProductById,
+    getProductsByCategoryName,
+    fetchProductByUserId,
+    addProduct,
+    isAddProduct,
+    productStoreMessage,
+    updateProduct,
+    deleteProduct,
+  };
 });

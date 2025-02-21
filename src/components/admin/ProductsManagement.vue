@@ -203,7 +203,7 @@
             </div>
 
             <button type="submit" class="btn rounded-0 me-2 btn-primary">Cập nhật sản phẩm</button>
-            <button type="submit" class="btn rounded-0 btn-danger">Ẩn sản phẩm</button>
+            <button type="submit" class="btn rounded-0 btn-danger" @click="doDeleteProduct">Xóa sản phẩm</button>
             <span class="text-success fs-6"> {{ productStoreMessage }}</span>
           </form>
         </template>
@@ -230,7 +230,7 @@ const useCategoryStores = useCategoryStore();
 const { categories, fetchCategories } = storeToRefs(useCategoryStores);
 
 const useProductsStore = useProducts();
-const { products, loading, error, fetchProductByUserId, addProduct, isAddProduct, updateProduct, productStoreMessage } = storeToRefs(useProductsStore);
+const { products, loading, error, fetchProductByUserId, addProduct, isAddProduct, updateProduct, productStoreMessage, deleteProduct } = storeToRefs(useProductsStore);
 
 const messageLoading = ref("Đang xử lý...");
 const imagePreview = ref("https://imageplaceholder.net/200x200/eeeeee/131313?text=chua+co+hinh+anh+san+pham");
@@ -306,6 +306,13 @@ const doUpdateProduct = async () => {
     productEdited.value.image = useUpload.imageUrl;
     useProductsStore.updateProduct(productEdited.value.id, productEdited.value);
   }
+};
+
+const doDeleteProduct = async () => {
+  useProductsStore.productStoreMessage = "Đang xóa sản phẩm...";
+  await nextTick();
+
+  await useProductsStore.deleteProduct(productEdited.value.id);
 };
 
 onMounted(async () => {
