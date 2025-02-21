@@ -17,7 +17,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isRoleUser = ref(false);
   const isRoleAdmin = ref(false);
   const isRoleManager = ref(false);
-
+  const isExpiredToken = ref(false);
   const showNoPermission = ref(false);
   const noPermissionMessage = ref("");
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
@@ -91,7 +91,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  const isTokenValid = async (token) => {
+  const isTokenExpired = async (token) => {
     try {
       const response = await fetch(`${apiUrl}/api/v1/auth/validateToken`, {
         method: "GET",
@@ -105,6 +105,7 @@ export const useAuthStore = defineStore("auth", () => {
 
       if (response.ok) {
         console.log("IS VALID TOKEN: ", response.data);
+        isValidToken.value = true;
       }
     } catch (err) {
       error.value = err;
@@ -113,13 +114,13 @@ export const useAuthStore = defineStore("auth", () => {
 
   const initAuth = () => {
     const userInLocal = JSON.parse(localStorage.getItem("user"));
-    isTokenValid(accessToken.value);
-    if (userInLocal) {
+    isTokenExpired(accessToken.value);
+    if (userInLocal && !isExpiredToken.value) {
       user.value = userInLocal;
       decodeUserRole();
     }
   };
 
   initAuth();
-  return { accessToken, user, isRoleManager, error, isLoading, login, logout, isRoleAdmin, isRoleUser, decodeUserRole, showNoPermission, noPermissionMessage };
+  return { accessToken, user, isRoleManager, error, isLoading, login, logout, isRoleAdmin, isRoleUser, decodeUserRole, showNoPermission, noPermissionMessage, isExpiredToken };
 });

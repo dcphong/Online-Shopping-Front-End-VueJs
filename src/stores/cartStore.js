@@ -17,5 +17,4 @@ export const useCartStore = defineStore("cart", {
   getters: {
     getSelectedProducts: (state) => state.selectedProducts, // Dùng getters thay vì "returns"
   },
-  persist: true,
 });

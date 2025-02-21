@@ -59,21 +59,25 @@ const adminRoutes = {
     {
       path: "",
       name: "AdminDashboard",
+      meta: { title: "Dashboard" },
       component: () => import("../components/admin/Dashboard.vue"),
     },
     {
       path: "products",
       name: "AdminProducts",
+      meta: { title: "Quản lý sản phẩm" },
       component: () => import("../components/admin/ProductsManagement.vue"),
     },
     {
       path: "users",
       name: "AdminUsers",
+      meta: { title: "Trang quản trị" },
       component: () => import("../components/admin/UsersManagement.vue"),
     },
     {
       path: "upload-image",
       name: "AdminUploadImage",
+      meta: { title: "Trang upload" },
       component: () => import("../components/admin/UploadManagement.vue"),
     },
   ],

@@ -17,12 +17,7 @@
       <div v-else-if="product" class="card shadow-lg p-3 mb-5 bg-body rounded">
         <div class="row g-0">
           <div class="col-md-6 d-flex align-items-center justify-content-center">
-            <img
-              :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
-              :alt="product.name"
-              class="img-fluid rounded"
-              style="max-height: 400px"
-            />
+            <img :src="product.image" :alt="product.name" class="img-fluid rounded" style="max-height: 400px" />
           </div>
           <div class="col-md-6">
             <div class="card-body">
@@ -46,7 +41,7 @@
         </div>
         <hr />
         <p class="fw-bold fs-4 m-0">Mô tả sản phẩm:</p>
-        <span class="fs-5 text-muted">{{ product.descriptions }}</span>
+        <span class="fs-5 text-muted" v-html="product.descriptions"></span>
       </div>
 
       <!-- Product Not Found -->
@@ -64,6 +59,7 @@
 
 <script setup>
 import moment from "moment";
+import { storeToRefs } from "pinia";
 import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import ConfirmModal from "../../components/user/ConfirmModal.vue";
@@ -79,9 +75,9 @@ import { useCartStore } from "../../stores/cartStore.js";
 const useCartStores = useCartStore();
 const { setSelectedProducts } = storeToRefs(useCartStores);
 
-const { user, fetchUserById } = useUsersStore();
+const useUsersStores = useUsersStore();
+const { user, fetchUserById } = storeToRefs(useUsersStores);
 
-import { storeToRefs } from "pinia";
 const useProductsStore = useProducts();
 const { loading, error, product, fetchProductById } = storeToRefs(useProductsStore);
 const { addToCart } = useProductsInCart();
@@ -92,7 +88,7 @@ const dateAfterFormated = computed(() => {
 
 const router = useRouter();
 const route = useRoute();
-const sellerName = computed(() => user.value?.fullName || "Không xác định");
+const sellerName = computed(() => useUsersStores.user?.fullName || "Không xác định");
 
 const useModal = useModalStore();
 const result = ref(null);
@@ -124,7 +120,7 @@ const buy = (product) => {
 
 onMounted(async () => {
   await useProductsStore.fetchProductById(route.params.id);
-  await fetchUserById(product.value.createdBy);
+  await useUsersStores.fetchUserById(product.value.createdBy);
 });
 </script>
 

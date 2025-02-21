@@ -5,10 +5,8 @@
       <button @click="handleUpload" class="btn btn-info" :disabled="isUpload">Upload</button>
       <div v-if="isUpload" class="text-info">Dang upload...</div>
 
-      <!-- Hiển thị thông báo lỗi nếu có -->
       <div v-if="error" class="alert alert-danger">{{ error }}</div>
 
-      <!-- Hiển thị ảnh nếu upload thành công -->
       <div v-if="image">
         <img :src="image" alt="Uploaded Image" class="img-thumbnail" />
       </div>
@@ -20,21 +18,19 @@
 import { ref } from "vue";
 import { useUploadStore } from "../../stores/uploadStore";
 
-const { uploadImage, isUpload, error, image } = useUploadStore();
+const { uploadImage, isUpload, error, image, imageUrl } = useUploadStore();
 
 const file = ref(null);
 
 const onFileChange = (event) => {
-  file.value = event.target.files[0]; // Lấy file từ input
+  file.value = event.target.files[0];
 };
 
-const handleUpload = () => {
+const handleUpload = async () => {
   if (file.value) {
-    uploadImage(file.value); // Gọi action uploadImage từ store
+    await uploadImage(file.value);
   }
 };
 </script>
 
-<style scoped>
-/* Thêm style tùy chỉnh */
-</style>
+<style scoped></style>

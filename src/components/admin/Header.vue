@@ -4,8 +4,12 @@
       <div class="container-fluid">
         <!-- Logo -->
         <a class="navbar-brand" href="#">
-          <img src="http://res.cloudinary.com/sof3022-image-cloudinary/image/upload/q_auto/f_auto/v1739116181/LOGOSHOP-MINI.png" class="w-25" alt="" />
+          <img class="img-fluid img-logo" src="http://res.cloudinary.com/sof3022-image-cloudinary/image/upload/q_auto/f_auto/v1739116181/LOGOSHOP-MINI.png" alt="" />
         </a>
+
+        <div>
+          <span class="text-white fs-3">{{ inforAddress }}</span>
+        </div>
 
         <!-- Nút toggle cho mobile -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
@@ -70,4 +74,17 @@ onMounted(async () => {
   const getUser = await JSON.parse(localStorage.getItem("user"));
   user.value = getUser;
 });
+
+const props = defineProps({
+  inforAddress: String,
+});
 </script>
+
+<style scoped>
+.nav-brand {
+  width: 50px;
+}
+.img-logo {
+  width: 50px;
+}
+</style>

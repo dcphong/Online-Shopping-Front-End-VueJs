@@ -7,7 +7,7 @@ export function useAuthGuard(to, from, next) {
 
   authStore.decodeUserRole();
 
-  if (to.meta.requiresAuth && !authStore.accessToken) {
+  if (to.meta.requiresAuth && !authStore.accessToken && authStore.isValidToken) {
     console.log("Chặn chưa đăng nhập!");
     next({
       path: "/auth/login",

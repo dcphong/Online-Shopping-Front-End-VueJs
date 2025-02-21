@@ -10,9 +10,9 @@
       <!-- Product Image -->
       <!-- <img :src="product.image" :alt="product.name" class="card-img-top product-image" /> -->
       <img
-        :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
+        :src="product.image == null ? 'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp' : product.image"
         :alt="product.name"
-        class="card-img-top product-image p-2"
+        class="product-image p-2"
       />
     </router-link>
 
@@ -87,7 +87,7 @@ const addToCart = () => {
 .product-image {
   width: 100%;
   height: 180px;
-  object-fit: cover;
+  object-fit: contain;
   aspect-ratio: 4/3;
 }
 
