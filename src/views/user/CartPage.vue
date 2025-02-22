@@ -29,11 +29,7 @@
         <!-- Duyệt danh sách sản phẩm của người bán -->
         <div v-for="product in group.products" :key="product.id" class="row product-row pt-2 pb-2 text">
           <div class="col-6" style="height: 80px">
-            <img
-              :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/e_background_removal/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
-              :alt="product.name"
-              class="w-25 img-fluid"
-            />
+            <img :src="product.image" :alt="product.name" class="w-25 img-fluid" />
             <p>{{ product.name }}</p>
           </div>
           <div class="col-2 text-danger d-flex align-items-center justify-content-end">{{ product.price }} VNĐ</div>

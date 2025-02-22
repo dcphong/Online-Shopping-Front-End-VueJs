@@ -9,13 +9,16 @@
   <div v-else class="carousel slide" data-bs-ride="carousel" id="carouselSlider">
     <div class="carousel-inner">
       <div class="carousel-item active">
-        <img src="https://imageplaceholder.net/1600x320/eeeeee/131313?text=hinh+anh+1" alt="" class="d-block w-100" />
+        <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1740230384/Banner%20Facebook%20Sale%2088.png" alt="" class="d-block w-100" />
       </div>
       <div class="carousel-item">
-        <img src="https://imageplaceholder.net/1600x320/eeeeee/131313?text=hinh+anh+2" alt="" class="d-block w-100" />
+        <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1740232123/banner2.png" alt="" class="d-block w-100" />
       </div>
       <div class="carousel-item">
-        <img src="https://imageplaceholder.net/1600x320/eeeeee/131313?text=hinh+anh+3" alt="" class="d-block w-100" />
+        <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1740232326/banner3.png" alt="" class="d-block w-100" />
+      </div>
+      <div class="carousel-item">
+        <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1740235040/minibanner3.png" alt="" class="d-block w-100" />
       </div>
       <button class="carousel-control-prev" type="button" data-bs-target="#carouselSlider" data-bs-slide="prev">
         <span class="carousel-contorl-prev-icon" arial-hidden="true"></span>

@@ -10,7 +10,7 @@
       <div class="col-md-9 border-0 p-0">
         <div class="card border-start shadow-sm p-4 rounded-0 border-0">
           <h4>
-            Hồ Sơ Của: <span class="fs-3 fw-bold">{{ user.fullName }}</span>
+            Hồ Sơ Của: <span class="fs-3 fw-bold">{{ user?.fullName }}</span>
           </h4>
           <p class="text-muted">Quản lý thông tin hồ sơ để bảo mật tài khoản</p>
 
@@ -19,25 +19,28 @@
             <div class="col-md-8">
               <div class="mb-3">
                 <label class="form-label fw-bold">Tên đăng nhập: </label>
-                <span class="form-control-plaintext d-inline ms-2 fw-normal">{{ user.username }}</span>
+                <span class="form-control-plaintext d-inline ms-2 fw-normal">{{ user?.username }}</span>
               </div>
 
               <div class="mb-3">
                 <label class="fw-bold d-inline">Tên:</label>
-                <input type="text" class="form-control d-inline w-50 rounded-0 ms-3" v-model="user.fullName" />
+                <p class="form-control-plaintext d-inline ms-2">{{ user?.fullName }}</p>
               </div>
 
               <div class="mb-3">
                 <label class="form-label fw-bold d-inline">Email</label>
-                <p class="form-control-plaintext d-inline ms-2">{{ maskedEmail(user.email) }}</p>
+                <p class="form-control-plaintext d-inline ms-2">{{ maskedEmail(user?.email) }}</p>
               </div>
-
+              <div class="mb-3">
+                <label class="form-label fw-bold d-inline">Địa chỉ</label>
+                <p class="form-control-plaintext d-inline ms-2">{{ user?.address }}</p>
+              </div>
               <div class="mb-3">
                 <label class="form-label fw-bold d-inline">Số điện thoại</label>
-                <p class="form-control-plaintext d-inline ms-2">{{ maskedPhone(user.phone) }}</p>
+                <p class="form-control-plaintext d-inline ms-2">{{ maskedPhone(user?.phone) }}</p>
               </div>
 
-              <button class="btn btn-danger px-4 rounded-0">Thay Đổi</button>
+              <button class="btn btn-danger px-4 rounded-0" @click="openEditProfileModal">Thay Đổi</button>
             </div>
 
             <!-- Avatar -->
@@ -50,20 +53,64 @@
               />
               <div class="mt-3">
                 <button class="btn btn-outline-secondary">Chọn Ảnh</button>
-                <p class="text-muted mt-2">Dụng lượng file tối đa 1MB. Định dạng: .JPEG, .PNG</p>
+                <p class="text-muted mt-2">Dụng lượng file tối đa 10MB. Định dạng: .JPEG, .PNG</p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <teleport to="body">
+      <base-modal :openModal="isOpenEditModal" :typeModal="'modal-lg'">
+        <template v-slot:header>
+          <h5 class="modal-title" id="addProductModalLabel">Thay đổi hồ sơ</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" @click.self="closeEditModal" aria-label="Close"></button>
+        </template>
+        <template v-slot>
+          <form @submit.prevent="doEditProfile">
+            <div class="row mb-2">
+              <div class="col-6">
+                <label for="phone">Họ và Tên:</label>
+                <input type="text" name="fullName" v-model="newProfile.fullName" class="form-control" />
+              </div>
+              <div class="col-6">
+                <label for="phone">Số điện thoại:</label>
+                <input type="text" name="phone" v-model="newProfile.phone" class="form-control" />
+              </div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-12">
+                <textarea name="address" v-model="newProfile.address" rows="5" class="form-control" id=""></textarea>
+              </div>
+            </div>
+            <div class="float-end">
+              <span v-html="userStoreMessage"></span>
+              <button class="btn btn-warning rounded-0">Cập nhật</button>
+            </div>
+          </form>
+        </template>
+      </base-modal>
+    </teleport>
+
+    <teleport to="body">
+      <loading :loading="isLoadingUserStores" :message="userStoreMessage"></loading>
+    </teleport>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { nextTick, onMounted, ref } from "vue";
+import BaseModal from "../../components/user/BaseModal.vue";
+import Loading from "../../components/user/Loading.vue";
 import ProfileSideBar from "../../components/user/ProfileSideBar.vue";
-const user = ref({});
+import { useUsersStore } from "../../stores/usersStore.js";
+
+const useUserStores = useUsersStore();
+const { fetchUserById, user, isLoadingUserStores, updateProfile, userStoreMessage } = storeToRefs(useUserStores);
+
+const isOpenEditModal = ref(false);
 const maskedEmail = (email) => {
   if (!email) return "";
   const [user, domain] = email.split("@");
@@ -75,7 +122,35 @@ const maskedPhone = (phone) => {
   return "*******" + phone.slice(-2);
 };
 
+const newProfile = ref({
+  fullName: "",
+  address: "",
+  phone: "",
+});
+
+const openEditProfileModal = async () => {
+  await useUserStores.fetchUserById(useUserStores.user.id);
+  await nextTick();
+
+  if (useUserStores.user) {
+    newProfile.value = {
+      fullName: useUserStores.user.fullName,
+      address: useUserStores.user.address,
+      phone: useUserStores.user.phone,
+    };
+    isOpenEditModal.value = true;
+  }
+};
+
+const closeEditModal = () => {
+  isOpenEditModal.value = !isOpenEditModal.value;
+};
+const doEditProfile = async () => {
+  useUserStores.userStoreMessage = "Đang cập nhật hồ sơ...";
+  await nextTick();
+  await useUserStores.updateProfile(useUserStores.user.id, newProfile.value);
+};
 onMounted(async () => {
-  user.value = await JSON.parse(localStorage.getItem("user"));
+  await useUserStores.fetchUserById(JSON.parse(localStorage.getItem("user")).id);
 });
 </script>

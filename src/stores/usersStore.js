@@ -2,14 +2,14 @@ import { defineStore } from "pinia";
 import { nextTick, ref } from "vue";
 
 export const useUsersStore = defineStore("users", () => {
-  const isLoading = ref(false);
+  const isLoadingUserStores = ref(false);
   const usersStoreError = ref(null);
   const users = ref([]);
-  const user = ref(null);
+  const user = ref({});
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
+  const userStoreMessage = ref("");
   const fetchAllUsers = async () => {
-    isLoading.value = true;
+    isLoadingUserStores.value = true;
     usersStoreError.value = null;
     try {
       const response = await fetch(apiUrl + "/api/v1/users");
@@ -22,13 +22,13 @@ export const useUsersStore = defineStore("users", () => {
     } catch (err) {
       usersStoreError.value = err.message;
     } finally {
-      isLoading.value = false;
+      isLoadingUserStores.value = false;
       await nextTick();
     }
   };
 
   const fetchUserById = async (id) => {
-    isLoading.value = true;
+    isLoadingUserStores.value = true;
     usersStoreError.value = null;
     try {
       const response = await fetch(`${apiUrl}/api/v1/users/${id}`);
@@ -41,9 +41,35 @@ export const useUsersStore = defineStore("users", () => {
     } catch (err) {
       usersStoreError.value = err.message;
     } finally {
-      isLoading.value = false;
+      isLoadingUserStores.value = false;
     }
   };
 
-  return { isLoading, usersStoreError, users, user, fetchAllUsers, fetchUserById };
+  const updateProfile = async (id, data) => {
+    userStoreMessage.value = "<span class='text-warning'>Đang cập nhật thông tin...</span>";
+    isLoadingUserStores.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/user/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        user.value = data.data;
+      }
+    } catch (err) {
+      console.log("UPDATE ERROR:", err);
+      userStoreMessage.value = "<span class='text-danger'>Đã xảy ra lỗi khi cập nhật t thông tin! </span>";
+    } finally {
+      isLoadingUserStores.value = false;
+      userStoreMessage.value = "<span class='text-sucess'>Cập nhật thông tin thành công!</span>";
+    }
+  };
+
+  return { isLoadingUserStores, usersStoreError, users, user, fetchAllUsers, fetchUserById, updateProfile, userStoreMessage };
 });

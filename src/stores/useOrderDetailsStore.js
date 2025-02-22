@@ -8,7 +8,6 @@ export const useOrderDetails = defineStore("orderDetails", () => {
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
   const createdOrderDetails = async (list) => {
-    console.log("ORDER DETAILS: ", toRaw(list));
     isOrderDetailsLoading.value = true;
     try {
       const response = await fetch(`${apiUrl}/api/v1/user/orderDetails`, {

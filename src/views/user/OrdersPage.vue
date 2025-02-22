@@ -14,10 +14,10 @@
           </div>
           <div class="card-body">
             <div v-if="orders.length > 0">
-              <table class="table table-bordered table-striped">
+              <table class="table table-bordered table-hover">
                 <thead class="table-dark">
                   <tr>
-                    <th>#</th>
+                    <th>STT</th>
                     <th>Ngày đặt</th>
                     <th>Địa chỉ</th>
                     <th>Tổng tiền</th>
@@ -60,7 +60,7 @@
                   <table class="table table-bordered">
                     <thead class="table-light">
                       <tr>
-                        <th>#</th>
+                        <th>STT</th>
                         <th>Sản phẩm</th>
                         <th>Số lượng</th>
                         <th>Giá</th>

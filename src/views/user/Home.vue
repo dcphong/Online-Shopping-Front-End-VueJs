@@ -6,11 +6,11 @@
         <Slider></Slider>
       </div>
       <div class="col-lg-4 col-12">
-        <div class="row">
-          <img src="https://imageplaceholder.net/1600x320/eeeeee/131313?text=Banner+1" alt="" class="d-block w-100" />
+        <div class="row mb-2">
+          <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1740234890/minibanner1.png" alt="" class="d-block w-100" />
         </div>
-        <div class="row">
-          <img src="https://imageplaceholder.net/1600x320/eeeeee/131313?text=Banner+2" alt="" class="d-block w-100" />
+        <div class="row mb-2">
+          <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1740234899/minibanner2.png" alt="" class="d-block w-100" />
         </div>
       </div>
     </div>

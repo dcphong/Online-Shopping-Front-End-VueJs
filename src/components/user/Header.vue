@@ -13,7 +13,7 @@
 
         <div class="collapse navbar-collapse" id="navbarNavAlt">
           <div class="navbar-nav w-100">
-            <router-link to="/" class="nav-link hover-effect fs-5">Trang chủ</router-link>
+            <router-link to="/" class="nav-link hover-effect fs-5 text-truncate">Trang chủ</router-link>
 
             <div class="dropdown">
               <button class="nav-link hover-effect dropdown-toggle m-0" data-bs-toggle="dropdown">Loại sản phẩm</button>
@@ -25,13 +25,13 @@
                 </li>
               </ul>
             </div>
-            <router-link to="/admin" class="nav-link admin-link-redirect fs-6">Kênh quản trị</router-link>
+            <router-link to="/admin" class="nav-link admin-link-redirect fs-6 text-truncate">Kênh quản trị</router-link>
 
             <!-- SEARCH -->
-            <form :action="'/search'" role="search" class="d-flex search w-50 ms-auto">
-              <input class="form-control rounded-end-0 inputSearch" id="search" v-model="searchValue" name="search" type="search" placeholder="Nhập..." />
-              <button @click="search" class="btn btn-outline-success rounded-start-0 inputSearch btnSearch">Tìm kiếm</button>
-            </form>
+            <div class="d-flex search w-50 ms-auto">
+              <input class="form-control rounded-end-0 inputSearch" id="search" v-model="searchValue" name="search" type="search" placeholder="Nhập từ khóa..." required />
+              <button @click="search" class="btn btn-outline-success rounded-start-0 inputSearch btnSearch text-truncate">Tìm kiếm</button>
+            </div>
             <!-- END SEARCH -->
 
             <div role="profile" class="d-flex profile ms-auto me-2">
@@ -46,11 +46,7 @@
                     </tr>
                     <tr class="" v-else v-for="(product, index) in cart.items.slice(0, 5)" :key="index">
                       <td class="p-0 m-0 w-25 border-bottom-0">
-                        <img
-                          :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/q_auto/f_auto/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
-                          :alt="'product image'"
-                          class="w-50 float-start"
-                        />
+                        <img :src="product.image" :alt="'product image'" class="w-100 float-start" />
                       </td>
                       <td class="p-0 m-0 w-50 border-bottom-0">
                         <p class="fs-6 text-start">{{ product.name }}</p>
@@ -94,17 +90,23 @@
 
 <script setup>
 import { inject, onMounted, reactive, ref, watchEffect } from "vue";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useProductsInCart } from "../../composables/useProductInCart";
 import { useAuthStore } from "../../stores/authStore";
 const { productsInCartNumber, cart } = useProductsInCart();
 const { logout, user } = useAuthStore();
 const router = useRouter();
-const token = ref(null);
+const route = useRoute();
+
 const isShowCart = ref(false);
 const searchValue = ref(null);
 const showCart = () => {
   isShowCart.value = !isShowCart.value;
+};
+const search = () => {
+  if (searchValue.value) {
+    router.push({ path: "/search", query: { search: searchValue.value } });
+  }
 };
 </script>
 

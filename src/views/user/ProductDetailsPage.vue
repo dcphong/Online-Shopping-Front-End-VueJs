@@ -73,7 +73,7 @@ const { cart } = useProductsInCart();
 
 import { useCartStore } from "../../stores/cartStore.js";
 const useCartStores = useCartStore();
-const { setSelectedProducts } = storeToRefs(useCartStores);
+const { setSelectedProducts, setSelectedProduct } = storeToRefs(useCartStores);
 
 const useUsersStores = useUsersStore();
 const { user, fetchUserById } = storeToRefs(useUsersStores);
@@ -112,8 +112,7 @@ const productSelected = ref([]);
 
 const buy = (product) => {
   productSelected.value.push(product);
-  console.log("PRODUCT SELECTED: ", productSelected.value);
-  useCartStores.setSelectedProducts(productSelected.value);
+  useCartStores.setSelectedProduct(productSelected.value);
 
   router.push("/user/payment");
 };

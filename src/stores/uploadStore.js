@@ -34,11 +34,12 @@ export const useUploadStore = defineStore("upload", () => {
         uploadError.value = data.message || "Upload failed!";
       }
     } catch (err) {
+      console.log("ERROR:", err);
       uploadError.value = err.message;
     } finally {
       isUpload.value = false;
     }
   };
 
-  return { isUpload, uploadError, image, uploadImage, imageUrl };
+  return { isUpload, uploadError, uploadError, image, uploadImage, imageUrl };
 });

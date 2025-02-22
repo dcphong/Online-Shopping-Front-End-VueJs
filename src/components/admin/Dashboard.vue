@@ -125,12 +125,7 @@
               <tr v-for="product in products.slice(0, 5)" :key="product.id">
                 <td>{{ product.id }}</td>
                 <td>
-                  <img
-                    :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
-                    alt="Product Image"
-                    class="img-thumbnail"
-                    style="width: 50px; height: 50px"
-                  />
+                  <img :src="product.image" alt="Product Image" class="img-thumbnail" style="width: 50px; height: 50px" />
                 </td>
                 <td>{{ product.name }}</td>
                 <td>${{ product.price.toFixed(2) }}</td>

@@ -19,7 +19,11 @@
     <!-- Product Details -->
     <div class="card-body text-center">
       <h5 class="card-title text-truncate" title="product.name">{{ product.name }}</h5>
-      <p class="card-price text-primary float-start fs-6 fw-normal float-start">đ{{ product.price }}</p>
+      <p v-if="product.discountPrice > 0" class="card-price text-orange float-start fs-6 fw-normal float-start">
+        <del class="text-muted">đ{{ product.price }}</del>
+        <span class="ms-2">đ{{ product.discountPrice.toLocaleString() }}</span>
+      </p>
+      <p v-else class="card-price text-orange float-start fs-6 fw-normal float-start">đ{{ product.price.toLocaleString() }}</p>
 
       <button v-if="product.available" @click="showModal(product.name, product.price)" class="btn btn-sm btn-outline-primary w-100">
         Thêm vào giỏ hàng
@@ -90,7 +94,9 @@ const addToCart = () => {
   object-fit: contain;
   aspect-ratio: 4/3;
 }
-
+.text-orange {
+  color: orangered;
+}
 .sale-banner {
   position: absolute;
   top: 0;

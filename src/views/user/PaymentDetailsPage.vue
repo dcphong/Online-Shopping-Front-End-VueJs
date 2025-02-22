@@ -46,11 +46,7 @@
             <div class="row bg-light mb-3">
               <div class="row d-flex align-items-center pt-2 pb-2" v-for="product in groups.products" :key="product.id">
                 <div class="col-6" style="height: 80px">
-                  <img
-                    :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1737736178/Untitleddesign_3_9bdd2355-4632-4233-8c1d-1583308606b4_dnryfl.webp'"
-                    :alt="'Tên sản phẩm'"
-                    class="w-25"
-                  />
+                  <img :src="product.image" :alt="'Tên sản phẩm'" class="w-25" />
                   <p>{{ product.name }}</p>
                 </div>
                 <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price }} VNĐ</div>
@@ -129,27 +125,34 @@
         </div>
       </div>
     </div>
+    <loading :loading="isOrdersLoading" :message="messageLoading"></loading>
   </div>
 </template>
 <script setup>
 import { computed, onMounted, ref } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
+import Loading from "../../components/user/Loading.vue";
+import { useProductsInCart } from "../../composables/useProductInCart.js";
 import { useProducts } from "../../composables/useProducts";
 import { useCartStore } from "../../stores/cartStore.js";
 import { useUsersStore } from "../../stores/usersStore";
+
+const { cart, removeProductInCart } = useProductsInCart();
 const { selectedProducts, setSelectedProducts, clearSelectedProducts } = useCartStore();
 
 import { useOrderDetails } from "../../stores/useOrderDetailsStore.js";
 import { useOrder } from "../../stores/useOrderStore.js";
 const { createdOrderDetails } = useOrderDetails();
-const { createdOrder, orderStore } = useOrder();
+const { createdOrder, orderStore, isOrdersLoading } = useOrder();
 
-const router = useRoute();
+const route = useRoute();
+const router = useRouter();
+
 const { products, loading, error, fetchProducts, fetchProductById } = useProducts();
 const { user, fetchUserById } = useUsersStore();
 
 const productFetch = computed(() => {
-  const product = products.value.find((p) => p.id == router.params.id);
+  const product = products.value.find((p) => p.id == route.params.id);
   return product ? product : { name: "Sản phẩm không tồn tại", id: null };
 });
 
@@ -158,12 +161,12 @@ const shippingFee = ref(25000);
 const formatNumber = (value) => {
   return new Intl.NumberFormat("vi-VN").format(value);
 };
+
 onMounted(async () => {
   await fetchProducts();
-  if (router.params.id) {
-    await fetchProductById(router.params.id);
+  if (route.params.id) {
+    await fetchProductById(route.params.id);
     await fetchUserById(productFetch.value.createdBy);
-    console.log(selectedProducts);
   }
 });
 
@@ -187,40 +190,48 @@ const groupedProductsBySaler = computed(() => {
 });
 
 const totalProductPrice = computed(() => {
-  if (selectedProducts.length < 1) {
+  if (selectedProducts.length <= 1) {
     return selectedProducts.reduce((sum, product) => sum + product.price * 1, 0);
   }
   return Object.values(groupedProductsBySaler.value).reduce((sum, group) => sum + group?.totalPrice, 0);
 });
+
 const totalShippingFee = computed(() => {
-  if (selectedProducts.length < 1) return shippingFee.value;
+  if (selectedProducts.length <= 1) return shippingFee.value;
   return Object.keys(groupedProductsBySaler.value).length * shippingFee.value;
 });
 
 const totalPrice = computed(() => {
   return totalProductPrice.value + totalShippingFee.value;
 });
+
 const address = ref(JSON.parse(localStorage.getItem("user"))?.address);
+
 const descriptionsForSeller = ref({});
+
 const order = ref({
   userId: JSON.parse(localStorage.getItem("user"))?.id || null,
   address: address.value,
   totalAmount: computed(() => totalPrice.value),
 });
 
+const messageLoading = ref("Đang xử lý...");
+
 const doOrder = async () => {
+  messageLoading.value = "Đang đặt hàng...";
+
   try {
     if (!order.value.userId || !order.value.address || !order.value.totalAmount) {
-      console.error("order.value thiếu thông tin cần thiết.");
+      alert("order.value thiếu thông tin cần thiết.");
       return;
     }
 
     const newOrder = await createdOrder(order.value);
 
     if (!newOrder || !newOrder.id) {
-      console.error("API không trả về orderId.");
       throw new Error("Order creation failed.");
     }
+
     const updatedOrderDetailsList = selectedProducts.map((product) => ({
       quantity: product.quantity || 1,
       price: product.price,
@@ -232,8 +243,13 @@ const doOrder = async () => {
 
     await createdOrderDetails(updatedOrderDetailsList);
     clearSelectedProducts();
+    for (let i = 0; i < selectedProducts.length; i++) {
+      await removeProductInCart(selectedProducts[i].id);
+    }
   } catch (error) {
-    console.error("Lỗi khi đặt hàng:", error);
+    console.log("Lỗi khi đặt hàng:", error.message);
+  } finally {
+    router.push("/user/orders");
   }
 };
 </script>

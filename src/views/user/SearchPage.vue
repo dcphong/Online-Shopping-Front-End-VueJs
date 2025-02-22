@@ -46,14 +46,19 @@
         <!-- END BỘ LỌC TÌM KIÉM -->
         <div class="col-9 bg-light p-3 border-start">
           <span class="fs-6">
-            <i class="bi bi-exclamation-circle"></i> Kết quả tìm kiếm của từ khóa <b>{{ route.query.search }}</b>
+            <div v-if="isNotFoundKeyword">
+              <i class="bi bi-exclamation-circle"></i><span class="text-danger"> Không tìm thấy kết quả tìm kiếm của từ khóa</span> <b>{{ route.query.search }}</b>
+            </div>
+            <div v-else-if="!isNotFoundKeyword">
+              <i class="bi bi-exclamation-circle"></i> Kết quả tìm kiếm của từ khóa <b>{{ route.query.search }}</b>
+            </div>
           </span>
 
           <!-- BỘ LỌC DANH SÁCH -->
           <div class="row mt-3 bg-dark-subtle p-3 align-items-center">
             <span class="col-auto">Sắp xếp theo</span>
             <div class="col d-flex gap-2">
-              <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" />
+              <input type="radio" class="btn-check" name="options" @click="sortProducts" id="option1" autocomplete="off" />
               <label class="btn btn-outline-dark" for="option1">Liên Quan</label>
 
               <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off" />
@@ -84,17 +89,28 @@
   </div>
 </template>
 <script setup>
-import { onMounted, ref } from "vue";
-
+import { storeToRefs } from "pinia";
+import { nextTick, onMounted, ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import ProductCard from "../../components/user/ProductCard.vue";
 import { useProducts } from "../../composables/useProducts";
-const { products, loading, error, fetchProducts, getProductsByCategoryName } = useProducts();
+const useProductsStore = useProducts();
+const { products, productStoreMessage, loading, isNotFoundKeyword, getProductsByCategoryName, fetchProductByKeyWords } = storeToRefs(useProductsStore);
 
 const route = useRoute();
+const sortProducts = () => {
+  console.log("SORT IS CLICKED");
+};
+watchEffect(async () => {
+  if (route.query.search) {
+    await useProductsStore.fetchProductByKeyWords(route.query.search);
+  }
+});
 
 onMounted(async () => {
-  await fetchProducts();
+  if (route.query.search) {
+    await useProductsStore.fetchProductByKeyWords(route.query.search);
+  }
 });
 </script>
 <style scoped>

@@ -3,7 +3,7 @@
     <div class="modal-dialog modal-dialog-centered" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title">{{ message }}</h5>
+          <h5 class="modal-title" v-html="message"></h5>
         </div>
         <div class="modal-body d-flex justify-content-center p-5 align-items-center">
           <div class="spinner-border text-dark" role="status">

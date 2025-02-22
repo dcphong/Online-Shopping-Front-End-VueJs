@@ -63,6 +63,7 @@ export const useAuthStore = defineStore("auth", () => {
     accessToken.value = null;
     role.value = null;
     isRoleAdmin.value = false;
+    isRoleManager.value = false;
     isRoleUser.value = false;
     router.push("/auth/login");
   };

@@ -9,7 +9,7 @@ export const useProducts = defineStore("products", () => {
   const productStoreMessage = ref("");
   const error = ref(null);
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
+  const isNotFoundKeyword = ref(false);
   // Fetch all products
   const fetchProducts = async () => {
     loading.value = true;
@@ -66,6 +66,27 @@ export const useProducts = defineStore("products", () => {
       products.value = data.data;
     } catch (err) {
       error.value = err.message;
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const fetchProductByKeyWords = async (key) => {
+    loading.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/products/search?key=${encodeURIComponent(key)}`);
+      if (response.ok) {
+        const data = await response.json();
+        products.value = data.data;
+        isNotFoundKeyword.value = false;
+      } else {
+        products.value = [];
+        isNotFoundKeyword.value = true;
+      }
+    } catch (err) {
+      productStoreMessage.value = "Lỗi khi tìm kiếm sản phẩm!";
+      isNotFoundKeyword.value = true;
+      products.value = [];
     } finally {
       loading.value = false;
     }
@@ -160,5 +181,7 @@ export const useProducts = defineStore("products", () => {
     productStoreMessage,
     updateProduct,
     deleteProduct,
+    fetchProductByKeyWords,
+    isNotFoundKeyword,
   };
 });

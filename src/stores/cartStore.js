@@ -9,6 +9,9 @@ export const useCartStore = defineStore("cart", {
     setSelectedProducts(products) {
       this.selectedProducts = products;
     },
+    setSelectedProduct(product) {
+      this.selectedProduct = product;
+    },
     clearSelectedProducts() {
       this.selectedProduct = {};
       this.selectedProducts = [];
@@ -17,4 +20,5 @@ export const useCartStore = defineStore("cart", {
   getters: {
     getSelectedProducts: (state) => state.selectedProducts, // Dùng getters thay vì "returns"
   },
+  persist: true,
 });

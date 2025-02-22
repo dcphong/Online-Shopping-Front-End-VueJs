@@ -1,6 +1,8 @@
 <template>
   <div
-    class="modal backdrop modal-static fade overflow-auto show d-block modal-lg"
+    v-if="openModal"
+    class="modal backdrop modal-staticoverflow-auto show d-block"
+    :class="typeModal"
     data-bs-backdrop="true"
     data-bs-keyboard="false"
     tabindex="-1"
@@ -15,15 +17,23 @@
         <div class="modal-body">
           <slot></slot>
         </div>
-        <div class="modal-footer">
-          <slot name="footer"></slot>
-        </div>
       </div>
     </div>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+const props = defineProps({
+  openModal: {
+    type: Boolean,
+    required: true,
+  },
+  typeModal: {
+    type: String,
+    required: true,
+  },
+});
+</script>
 
 <style scoped>
 .modal {

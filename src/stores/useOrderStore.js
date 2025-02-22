@@ -80,7 +80,6 @@ export const useOrder = () => {
   };
 
   const createdOrder = async (order) => {
-    console.log("ORDER: ", order);
     isOrdersLoading.value = true;
     try {
       const response = await fetch(`${apiUrl}/api/v1/user/orders`, {
