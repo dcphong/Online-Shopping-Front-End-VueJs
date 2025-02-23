@@ -47,6 +47,83 @@ export const useUsersStore = defineStore("users", () => {
     }
   };
 
+  const fetchUserByUsername = async (username) => {
+    isLoadingUserStores.value = true;
+    usersStoreError.value = null;
+    const formData = new URLSearchParams();
+    formData.append("username", username);
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/users/search/username`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        user.value = data.data;
+      } else {
+        usersStoreError.value = "Failed to fetch user with username: " + username;
+      }
+    } catch (err) {
+      usersStoreError.value = err.message;
+    } finally {
+      isLoadingUserStores.value = false;
+    }
+  };
+  const fetchUserByPhone = async (phone) => {
+    isLoadingUserStores.value = true;
+    usersStoreError.value = null;
+    const formData = new URLSearchParams();
+    formData.append("phone", phone);
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/users/search/phone`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        user.value = data.data;
+      } else {
+        usersStoreError.value = "Failed to fetch user with phone: " + phone;
+      }
+    } catch (err) {
+      usersStoreError.value = err.message;
+    } finally {
+      isLoadingUserStores.value = false;
+    }
+  };
+
+  const fetchUserByEmail = async (email) => {
+    isLoadingUserStores.value = true;
+    usersStoreError.value = null;
+    const formData = new URLSearchParams();
+    formData.append("email", email);
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/users/search/email`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        user.value = data.data;
+      } else {
+        usersStoreError.value = "Failed to fetch user with email: " + email;
+      }
+    } catch (err) {
+      usersStoreError.value = err.message;
+    } finally {
+      isLoadingUserStores.value = false;
+    }
+  };
+
   const updateProfile = async (id, data) => {
     userStoreMessage.value = "<span class='text-warning'>Đang cập nhật thông tin...</span>";
     isLoadingUserStores.value = true;
@@ -143,5 +220,8 @@ export const useUsersStore = defineStore("users", () => {
     checkValidPasswordNewChange,
     changePassword,
     isChangingPassword,
+    fetchUserByUsername,
+    fetchUserByPhone,
+    fetchUserByEmail,
   };
 });

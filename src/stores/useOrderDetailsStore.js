@@ -56,11 +56,36 @@ export const useOrderDetails = defineStore("orderDetails", () => {
     }
   };
 
+  const groupOrderDetailsByOrderId = async (id) => {
+    isOrderDetailsLoading.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/user/orderDetails/product/order/${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        orderDetails.value = data.data || [];
+      } else {
+        orderDetails.value = [];
+        orderDetailsError.value = "Failed to fetch order details from server";
+      }
+    } catch (err) {
+      orderDetailsError.value = err.message;
+    } finally {
+      isOrderDetailsLoading.value = false;
+    }
+  };
+
   return {
     isOrderDetailsLoading,
     orderDetails,
     orderDetailsError,
     fetchOrderDetailsByOrderId,
     createdOrderDetails,
+    groupOrderDetailsByOrderId,
   };
 });

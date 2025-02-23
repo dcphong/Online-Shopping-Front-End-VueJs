@@ -14,6 +14,7 @@ export const useAuthStore = defineStore("auth", () => {
   const refreshToken = ref(localStorage.getItem("refreshToken") || null);
   const router = useRouter();
   const role = ref(null);
+  const authMessage = ref("");
   const isRoleUser = ref(false);
   const isRoleAdmin = ref(false);
   const isRoleManager = ref(false);
@@ -53,8 +54,36 @@ export const useAuthStore = defineStore("auth", () => {
       isLoading.value = false;
     }
   };
+
+  const register = async (data) => {
+    console.log("REGISTER API IS CALLED!");
+    isLoading.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/auth/registry`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        authMessage.value = `<span class='text-success fs-6'>Tạo tài khoản thành công!</span>`;
+      } else {
+        authMessage.value = `<span class='text-danger fs-6'>Có lỗi xảy ra trong quá trình tạo tài khoản!</span>`;
+      }
+    } catch (err) {
+      console.log("REGISTRY ERROR", err.message);
+      authMessage.value = `<span class='text-danger fs-6'>Lỗi: ${err.message}!</span>`;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
     localStorage.removeItem("cart");
     localStorage.removeItem("orderDetails");
     localStorage.removeItem("user");
@@ -122,5 +151,5 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   initAuth();
-  return { accessToken, user, isRoleManager, error, isLoading, login, logout, isRoleAdmin, isRoleUser, decodeUserRole, showNoPermission, noPermissionMessage, isExpiredToken };
+  return { accessToken, user, isRoleManager, error, isLoading, login, logout, isRoleAdmin, isRoleUser, decodeUserRole, showNoPermission, noPermissionMessage, isExpiredToken, authMessage, register };
 });

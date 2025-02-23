@@ -30,11 +30,21 @@
         <div v-for="product in group.products" :key="product.id" class="row product-row pt-2 pb-2 text">
           <div class="col-6" style="height: 80px">
             <img :src="product.image" :alt="product.name" class="w-25 img-fluid" />
-            <p>{{ product.name }}</p>
+            <p>{{ product.name.length > 50 ? product.name.substring(0, 40) + "..." : product.name }}</p>
           </div>
-          <div class="col-2 text-danger d-flex align-items-center justify-content-end">{{ product.price }} VNĐ</div>
-          <div class="col-1 d-flex align-items-center justify-content-end">{{ product.quantity }}</div>
-          <div class="col-2 text-danger d-flex align-items-center justify-content-end">{{ product.quantity * product.price }} VNĐ</div>
+          <template v-if="product.discountPrice > 0">
+            <div class="col-2 text-danger d-flex align-items-center justify-content-end">
+              <del class="fs-6 me-2 text-muted">{{ product.price.toLocaleString() }}</del>
+              {{ product.discountPrice.toLocaleString() }}đ
+            </div>
+            <div class="col-1 d-flex align-items-center justify-content-end">{{ product.quantity }}</div>
+            <div class="col-2 text-danger d-flex align-items-center justify-content-end">{{ (product.quantity * product.discountPrice).toLocaleString() }}đ</div>
+          </template>
+          <template v-else>
+            <div class="col-2 text-danger d-flex align-items-center justify-content-end">{{ product.price.toLocaleString() }}đ</div>
+            <div class="col-1 d-flex align-items-center justify-content-end">{{ product.quantity }}</div>
+            <div class="col-2 text-danger d-flex align-items-center justify-content-end">{{ (product.quantity * product.price).toLocaleString() }}đ</div>
+          </template>
           <div class="col-1 d-flex align-items-center justify-content-end">
             <button class="btn btn-outline-dark w-100 rounded-0" @click="removeProductInCart(product.id)">Xóa</button>
           </div>

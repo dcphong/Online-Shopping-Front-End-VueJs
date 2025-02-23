@@ -49,9 +49,21 @@
                   <img :src="product.image" :alt="'Tên sản phẩm'" class="w-25" />
                   <p>{{ product.name }}</p>
                 </div>
-                <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price }} VNĐ</div>
-                <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product?.quantity || 1 }}</div>
-                <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price * product?.quantity || product.price * 1 }} VNĐ</div>
+                <template v-if="product.discountPrice > 0">
+                  <div class="col-2 d-flex align-items-center justify-content-end">
+                    <del class="fs-6 text-muted me-2">{{ product.price.toLocaleString() }}</del>
+                    {{ product.discountPrice.toLocaleString() }}đ
+                  </div>
+                  <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product?.quantity || 1 }}</div>
+                  <div class="col-2 d-flex align-items-center justify-content-end">
+                    {{ (product.discountPrice * product?.quantity).toLocaleString() || (product.discountPrice * 1).toLocaleString() }}đ
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price.toLocaleString() }}đ</div>
+                  <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product?.quantity || 1 }}</div>
+                  <div class="col-2 d-flex align-items-center justify-content-end">{{ (product.price * product?.quantity).toLocaleString() || (product.price * 1).toLocaleString() }}đ</div>
+                </template>
               </div>
 
               <div class="row border m-0">
@@ -66,7 +78,7 @@
                   <div class="mb-3">
                     <span> <i class="bi bi-truck text-dark"></i> Phương thức vận chuyển: </span>
                     <p class="d-inline text-success">Nhanh</p>
-                    <p class="d-inline text-secondary ms-5" :bind="shippingFee">{{ formatNumber(shippingFee) + " VNĐ" }}</p>
+                    <p class="d-inline text-secondary ms-5" :bind="shippingFee">{{ formatNumber(shippingFee) + " đ" }}</p>
                     <button class="d-inline text-primary float-end border-0 bg-body-tertiary me-2">Thay đổi</button>
                   </div>
                   <hr class="m-0" />
@@ -77,7 +89,7 @@
                 <div class="row m-0">
                   <div class="d-flex justify-content-end p-4">
                     <span class="fw-bold"
-                      >Tống: <b class="fw-normal fs-6 text-danger">{{ formatNumber(shippingFee + groups?.totalPrice || totalPrice) + " VNĐ" }}</b>
+                      >Tống: <b class="fw-normal fs-6 text-danger">{{ formatNumber(shippingFee + groups?.totalPrice || totalPrice) + " đ" }}</b>
                     </span>
                   </div>
                 </div>
@@ -106,15 +118,15 @@
             <div class="float-end">
               <div class="d-flex justify-content-between">
                 <p class="fw-normal">Tổng tiền hàng:</p>
-                <span>{{ formatNumber(totalProductPrice) }} VNĐ</span>
+                <span>{{ formatNumber(totalProductPrice) }} đ</span>
               </div>
               <div class="d-flex justify-content-between">
                 <p class="fw-normal">Tổng tiền phí vận chuyển:</p>
-                <span>{{ formatNumber(totalShippingFee) }} VNĐ</span>
+                <span>{{ formatNumber(totalShippingFee) }} đ</span>
               </div>
               <div class="d-flex justify-content-between">
                 <p class="fw-norma me-2">Tổng thanh toán:</p>
-                <span class="fw-bold fs-5 text-danger">{{ formatNumber(totalPrice) }} VNĐ</span>
+                <span class="fw-bold fs-5 text-danger">{{ formatNumber(totalPrice) }} đ</span>
               </div>
             </div>
           </div>
@@ -174,7 +186,7 @@ const groupedProductsBySaler = computed(() => {
   return selectedProducts.reduce((groups, product) => {
     const sellerId = product.createdBy;
     const sellerFullname = product.userCreatedName;
-    const totalPrice = product.price * product.quantity;
+    const totalPrice = product.discountPrice > 0 ? product.discountPrice * product.quantity : product.price * product.quantity;
     if (!groups[sellerId]) {
       groups[sellerId] = {
         sellerId: sellerId,
@@ -184,7 +196,7 @@ const groupedProductsBySaler = computed(() => {
       };
     }
     groups[sellerId].products.push(product);
-    groups[sellerId].totalPrice += product.price * product.quantity;
+    groups[sellerId].totalPrice += product.discountPrice > 0 ? product.discountPrice * product.quantity : product.price * product.quantity;
     return groups;
   }, {});
 });
@@ -213,7 +225,7 @@ const newAddress = ref("");
 
 const order = ref({
   userId: JSON.parse(localStorage.getItem("user"))?.id || null,
-  address: "",
+  address: JSON.parse(localStorage.getItem("user"))?.address || "",
   totalAmount: computed(() => totalPrice.value),
 });
 const updateAddress = () => {
@@ -227,7 +239,7 @@ const doOrder = async () => {
 
   try {
     if (!order.value.userId || !order.value.address || !order.value.totalAmount) {
-      alert("order.value thiếu thông tin cần thiết.");
+      console.log("order.value thiếu thông tin cần thiết.,", order.value);
       return;
     }
 

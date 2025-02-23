@@ -49,8 +49,8 @@
 
         <!-- Modal Chi Tiết Đơn Hàng -->
         <teleport to="body"
-          ><div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
+          ><div class="modal fade modal-xl" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="detailsModalLabel">Chi tiết đơn hàng</h5>
@@ -65,15 +65,27 @@
                         <th>Số lượng</th>
                         <th>Giá</th>
                         <th>Tổng</th>
+                        <th>Mô tả</th>
                       </tr>
                     </thead>
                     <tbody v-if="orderDetails.length > 0">
                       <tr v-for="(detail, index) in orderDetails" :key="detail.id">
                         <td>{{ index + 1 }}</td>
-                        <td>{{ detail.descriptions }}</td>
+                        <td>
+                          <img :src="detail.product.image" style="width: 50px" alt="" />
+                          <span class="text-truncate">{{ detail.product.name }}</span>
+                        </td>
                         <td>{{ detail.quantity }}</td>
-                        <td>{{ formatPrice(detail.price) }}</td>
-                        <td>{{ formatPrice(detail.total) }}</td>
+                        <template v-if="detail.product.discountPrice > 0">
+                          <td>{{ formatPrice(detail.product.discountPrice) }}</td>
+                          <td>{{ formatPrice(detail.product.discountPrice * detail.quantity) }}</td>
+                        </template>
+                        <template v-else>
+                          <td>{{ formatPrice(detail.price) }}</td>
+                          <td>{{ formatPrice(detail.total) }}</td>
+                        </template>
+
+                        <td>{{ detail.descriptions }}</td>
                       </tr>
                     </tbody>
                     <tbody v-else>
@@ -102,7 +114,7 @@ import { useOrder } from "../../stores/useOrderStore.js";
 const { orders, order, isOrdersLoading, ordersError, fetchOrderById, fetchOrderByUserId } = useOrder();
 
 const orderDetailsStore = useOrderDetails();
-const { orderDetails, fetchOrderDetailsByOrderId } = storeToRefs(orderDetailsStore);
+const { orderDetails, groupOrderDetailsByOrderId } = storeToRefs(orderDetailsStore);
 const user = ref({});
 
 const formatDate = (dateString) => {
@@ -134,7 +146,7 @@ const getStatusClass = (status) => {
   };
 };
 const fetchOrderDetails = async (id) => {
-  await orderDetailsStore.fetchOrderDetailsByOrderId(id);
+  await orderDetailsStore.groupOrderDetailsByOrderId(id);
 };
 
 onMounted(async () => {
