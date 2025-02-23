@@ -19,10 +19,10 @@
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                  <input type="text" v-model="address" class="form-control" />
+                  <input type="text" v-model="newAddress" class="form-control" />
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-success" data-bs-dismiss="modal">Đồng ý</button>
+                  <button type="button" class="btn btn-success" @click="updateAddress" data-bs-dismiss="modal">Đồng ý</button>
                 </div>
               </div>
             </div>
@@ -209,12 +209,17 @@ const address = ref(JSON.parse(localStorage.getItem("user"))?.address);
 
 const descriptionsForSeller = ref({});
 
+const newAddress = ref("");
+
 const order = ref({
   userId: JSON.parse(localStorage.getItem("user"))?.id || null,
-  address: address.value,
+  address: "",
   totalAmount: computed(() => totalPrice.value),
 });
-
+const updateAddress = () => {
+  order.value.address = newAddress.value;
+  address.value = newAddress.value;
+};
 const messageLoading = ref("Đang xử lý...");
 
 const doOrder = async () => {

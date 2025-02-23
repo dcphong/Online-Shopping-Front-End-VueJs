@@ -49,6 +49,12 @@ const userRoutes = {
       meta: { requiresAuth: true },
       component: () => import("../views/user/OrdersPage.vue"),
     },
+    {
+      path: "user/changePassword",
+      name: "UserChangePassword",
+      meta: { requiresAuth: true },
+      component: () => import("../views/user/ChangedPasswordPage.vue"),
+    },
   ],
 };
 const adminRoutes = {

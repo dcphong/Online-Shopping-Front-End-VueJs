@@ -41,12 +41,11 @@ export const useAuthStore = defineStore("auth", () => {
         localStorage.setItem("accessToken", data.accessToken);
         localStorage.setItem("refreshToken", data.refreshToken);
         localStorage.setItem("user", JSON.stringify(data.user));
-        const savedUrl = router.currentRoute.value.query.redirect || "/";
         decodeUserRole();
         user.value = JSON.parse(localStorage.getItem("user"));
         router.push(router.currentRoute.value.query.redirect || "/");
-      } else {
-        error.value = "Dang nhap khong hop le";
+      } else if (response.status == 403) {
+        error.value = `<span class='text-danger fs-6'>Tài khoảng hoặc mật khẩu không chính xác</span>`;
       }
     } catch (err) {
       error.value = err;
@@ -95,7 +94,7 @@ export const useAuthStore = defineStore("auth", () => {
   const isTokenExpired = async (token) => {
     try {
       const response = await fetch(`${apiUrl}/api/v1/auth/validateToken`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -103,19 +102,19 @@ export const useAuthStore = defineStore("auth", () => {
           accessToken: token,
         }),
       });
-
       if (response.ok) {
-        console.log("IS VALID TOKEN: ", response.data);
-        isValidToken.value = true;
+        const data = await response.json();
+        isExpiredToken.value = data.data;
       }
     } catch (err) {
-      error.value = err;
+      error.value = err.message;
+      console.log(err.message);
     }
   };
 
-  const initAuth = () => {
+  const initAuth = async () => {
     const userInLocal = JSON.parse(localStorage.getItem("user"));
-    isTokenExpired(accessToken.value);
+    await isTokenExpired(accessToken.value);
     if (userInLocal && !isExpiredToken.value) {
       user.value = userInLocal;
       decodeUserRole();

@@ -22,12 +22,17 @@
           <div class="col-md-6">
             <div class="card-body">
               <h1 class="card-title">{{ product.name }}</h1>
-              <div class="d-block" :class="product.discountPrice ? 'bg-dark-subtle' : ''">
-                <h3 class="text-danger d-inline fs-3">{{ product.price.toLocaleString() }} VNĐ</h3>
-                <h3 v-if="product.discountPrice" class="text-gray d-inline mx-3 fs-4 fw-normal">
+
+              <div v-if="product.discountPrice > 0" class="d-block" :class="product.discountPrice ? 'bg-dark-subtle' : ''">
+                <h3 class="text-danger d-inline fs-3">{{ product.discountPrice.toLocaleString() }} VNĐ</h3>
+                <h3 class="text-gray d-inline mx-3 fs-4 fw-normal">
                   <del>{{ product.price.toLocaleString() }} VNĐ</del>
                 </h3>
               </div>
+              <div v-else class="d-block">
+                <h3 class="text-danger d-inline fs-3">{{ product.price.toLocaleString() }} VNĐ</h3>
+              </div>
+
               <p class="card-text text-muted">Ngày bán: {{ dateAfterFormated }} - Người bán: {{ sellerName }}</p>
               <p class="card-text" v-if="product.categoryName">Loại sản phẩm: {{ product.categoryName }}</p>
               <p class="card-text" v-else>Danh mục: Chưa cập nhật</p>
@@ -112,7 +117,7 @@ const productSelected = ref([]);
 
 const buy = (product) => {
   productSelected.value.push(product);
-  useCartStores.setSelectedProduct(productSelected.value);
+  useCartStores.setSelectedProducts(productSelected.value);
 
   router.push("/user/payment");
 };

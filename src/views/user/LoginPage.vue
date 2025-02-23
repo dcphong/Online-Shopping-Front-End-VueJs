@@ -8,7 +8,7 @@
         <div class="mb-3">
           <input type="password" v-model="userLogin.password" placeholder="Nhập mật khẩu" class="form-control input-control-media" />
         </div>
-        <span v-if="loginMessage" class="text-danger fs-6">{{ loginMessage }}</span>
+        <span v-if="error" class="text-danger fs-6" v-html="error"></span>
         <div class="d-flex justify-content-between justify-content-center gap-2 mb-2">
           <button class="btn btn-outline-primary w-100 input-control-media" @click="handlerLogin()">Đăng nhập</button>
         </div>
@@ -26,16 +26,20 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { computed, nextTick, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useAuthStore } from "../../stores/authStore";
 const userLogin = ref({
   username: "",
   password: "",
 });
-const { login, user } = useAuthStore();
+const authStore = useAuthStore();
+const { login, user, error } = storeToRefs(authStore);
 const handlerLogin = async () => {
-  await login(userLogin.value.username, userLogin.value.password);
+  error.value = `<span class='text-info fs-6'>Đang đăng nhập...</span>`;
+  await nextTick();
+  await authStore.login(userLogin.value.username, userLogin.value.password);
 };
 
 const route = useRoute();
