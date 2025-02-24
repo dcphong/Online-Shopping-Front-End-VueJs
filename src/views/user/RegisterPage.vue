@@ -3,35 +3,35 @@
     <form @submit.prevent="doRegister" class="card card-dark bg-white p-3 w-50 input-media">
       <div class="row">
         <div class="col-6 mb-2">
-          <input type="text" required v-model="newAccount.username" placeholder="Nhập username" class="form-control rounded-0 input-control-media" />
+          <input type="text" v-model="newAccount.username" placeholder="Nhập username" class="form-control rounded-0 input-control-media" />
           <span class="text-danger" v-if="validateAccount.username" v-html="validateAccount.username"></span>
         </div>
         <div class="col-6 mb-2">
-          <input type="phone" required v-model="newAccount.phone" placeholder="Nhập số điện thoại" class="form-control rounded-0 input-control-media" />
+          <input type="phone" v-model="newAccount.phone" placeholder="Nhập số điện thoại" class="form-control rounded-0 input-control-media" />
           <span class="text-danger" v-if="validateAccount.phone" v-html="validateAccount.phone"></span>
         </div>
       </div>
       <div class="row">
         <div class="col-6 mb-2">
-          <input type="email" required v-model="newAccount.email" placeholder="Nhập Email" class="form-control rounded-0 input-control-media" />
+          <input type="email" v-model="newAccount.email" placeholder="Nhập Email" class="form-control rounded-0 input-control-media" />
           <span class="text-danger" v-if="validateAccount.email" v-html="validateAccount.email"></span>
         </div>
         <div class="col-6 mb-2">
-          <input type="text" required v-model="newAccount.fullName" placeholder="Nhập họ và tên" class="form-control rounded-0 input-control-media" />
+          <input type="text" v-model="newAccount.fullName" placeholder="Nhập họ và tên" class="form-control rounded-0 input-control-media" />
           <span class="text-danger" v-if="validateAccount.fullName" v-html="validateAccount.fullName"></span>
         </div>
         <div class="col-12 mb-2">
-          <textarea name="address" required placeholder="Nhập địa chỉ..." v-model="newAccount.address" rows="2" cols="50" class="form-control" id=""></textarea>
+          <textarea name="address" placeholder="Nhập địa chỉ..." v-model="newAccount.address" rows="2" cols="50" class="form-control" id=""></textarea>
           <span class="text-danger" v-if="validateAccount.address" v-html="validateAccount.address"></span>
         </div>
       </div>
       <div class="row">
         <div class="col-6 mb-3">
-          <input type="password" required v-model="newAccount.password" placeholder="Nhập mật khẩu" class="form-control rounded-0 input-control-media" />
+          <input type="password" v-model="newAccount.password" placeholder="Nhập mật khẩu" class="form-control rounded-0 input-control-media" />
           <span class="text-danger" v-if="validateAccount.password" v-html="validateAccount.password"></span>
         </div>
         <div class="col-6 mb-3">
-          <input type="password" required v-model="newAccount.confirmPassword" placeholder="Xác nhận mật khẩu" class="form-control rounded-0 input-control-media" />
+          <input type="password" v-model="newAccount.confirmPassword" placeholder="Xác nhận mật khẩu" class="form-control rounded-0 input-control-media" />
           <span class="text-danger" v-if="validateAccount.confirmPassword" v-html="validateAccount.confirmPassword"></span>
         </div>
       </div>
@@ -45,21 +45,45 @@
     <teleport to="body">
       <Loading :loading="isLoading" :message="'Đang xử lý đăng ký...'" />
     </teleport>
+    <Teleport to="body">
+      <base-modal :openModal="isOpenEnterOtp" :typeModal="'modal-md'">
+        <template v-slot:header>
+          <h5 class="modal-title">Nhập mã OTP</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" @click.self="isOpenEnterOtp = false" aria-label="Close"></button>
+        </template>
+        <template v-slot>
+          <form @submit.prevent="verifyOTP">
+            <div class="mb-3">
+              <label for="otp" class="form-label">Nhập mã OTP</label>
+              <input type="text" class="form-control" id="otp" v-model="otp" />
+            </div>
+            <span v-html="otpMessage"></span>
+            <button type="submit" class="btn btn-primary float-end rounded-0">Xác nhận</button>
+          </form>
+        </template>
+      </base-modal>
+    </Teleport>
   </div>
 </template>
 <script setup>
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import BaseModal from "../../components/user/BaseModal.vue";
 import Loading from "../../components/user/Loading.vue";
 import { useAuthStore } from "../../stores/authStore";
+import { useOtpStore } from "../../stores/OtpStore";
+import { useUsersStore } from "../../stores/usersStore";
+
+const otpStore = useOtpStore();
+const { isValidOtp, receiveOtp, otpMessage, validateOtp } = storeToRefs(otpStore);
+
 const router = useRouter();
 const authStore = useAuthStore();
 const { register, authMessage, isLoading } = storeToRefs(authStore);
 
-import { useUsersStore } from "../../stores/usersStore";
 const userStore = useUsersStore();
-const { fetchUserByUsername, fetchUserByPhone, fetchUserByEmail, user } = storeToRefs(userStore);
+const { fetchUserByUsername, fetchUserByPhone, fetchUserByEmail } = storeToRefs(userStore);
 
 const newAccount = ref({
   username: "",
@@ -71,8 +95,6 @@ const newAccount = ref({
   address: "",
 });
 
-const isValidAccount = ref(true);
-
 const validateAccount = ref({
   username: "",
   password: "",
@@ -83,79 +105,85 @@ const validateAccount = ref({
   address: "",
 });
 
+const validateInput = async () => {
+  let isValid = true;
+  validateAccount.value = {}; // Reset lỗi
+
+  // Gửi request lấy dữ liệu người dùng song song
+  await Promise.all([userStore.fetchUserByUsername(newAccount.value.username), userStore.fetchUserByPhone(newAccount.value.phone), userStore.fetchUserByEmail(newAccount.value.email)]);
+
+  if (!newAccount.value.username) {
+    validateAccount.value.username = "Vui lòng nhập username!";
+    isValid = false;
+  } else if (userStore.user && userStore.user.username === newAccount.value.username) {
+    validateAccount.value.username = "Username đã tồn tại!";
+    isValid = false;
+  }
+
+  if (!newAccount.value.phone) {
+    validateAccount.value.phone = "Vui lòng nhập số điện thoại!";
+    isValid = false;
+  } else if (userStore.user && userStore.user.phone === newAccount.value.phone) {
+    validateAccount.value.phone = "Số điện thoại đã được sử dụng!";
+    isValid = false;
+  }
+
+  if (!newAccount.value.email) {
+    validateAccount.value.email = "Vui lòng nhập email!";
+    isValid = false;
+  } else if (userStore.user && userStore.user.email === newAccount.value.email) {
+    validateAccount.value.email = "Email đã được sử dụng!";
+    isValid = false;
+  }
+
+  if (!newAccount.value.password || newAccount.value.password.length < 5) {
+    validateAccount.value.password = "Mật khẩu phải có ít nhất 5 ký tự!";
+    isValid = false;
+  }
+
+  if (!newAccount.value.confirmPassword) {
+    validateAccount.value.confirmPassword = "Vui lòng xác nhận mật khẩu!";
+    isValid = false;
+  } else if (newAccount.value.confirmPassword !== newAccount.value.password) {
+    validateAccount.value.confirmPassword = "Mật khẩu không khớp!";
+    isValid = false;
+  }
+
+  if (!newAccount.value.fullName || newAccount.value.fullName.length < 5) {
+    validateAccount.value.fullName = "Họ và tên phải có ít nhất 5 ký tự!";
+    isValid = false;
+  }
+
+  if (!newAccount.value.address || newAccount.value.address.length < 20) {
+    validateAccount.value.address = "Địa chỉ phải có ít nhất 20 ký tự!";
+    isValid = false;
+  }
+
+  return isValid;
+};
+
+const isOpenEnterOtp = ref(false);
+const otp = ref("");
+
 const doRegister = async () => {
-  if (newAccount.value.username) {
-    await userStore.fetchUserByUsername(newAccount.value.username);
-    if (userStore.user.username == newAccount.value.username) {
-      validateAccount.value.username = `<span class='text-danger fs-6'>Username đã tồn tại!</span>`;
-      isValidAccount.value = false;
-      userStore.user = null;
-    }
-  } else {
-    isValidAccount.value = false;
-
-    validateAccount.value.username = `<span class='text-danger fs-6'>Vui lòng nhập username!</span>`;
+  if (await validateInput()) {
+    isOpenEnterOtp.value = true;
+    await otpStore.receiveOtp(newAccount.value.email);
   }
+};
 
-  if (newAccount.value.phone) {
-    await userStore.fetchUserByPhone(newAccount.value.phone);
-    if (userStore.user.phone == newAccount.value.phone) {
-      validateAccount.value.phone = `<span class='text-danger fs-6'>Số điện thoại đã được sử dụng!</span>`;
-      isValidAccount.value = false;
-
-      userStore.user = null;
-    }
-  } else {
-    isValidAccount.value = false;
-
-    validateAccount.value.phone = `<span class='text-danger fs-6'>Vui lòng nhập số điện thoại!</span>`;
-  }
-
-  if (newAccount.value.email) {
-    await userStore.fetchUserByEmail(newAccount.value.email);
-    if (userStore.user.email == newAccount.value.email) {
-      validateAccount.value.email = `<span class='text-danger fs-6'>Email đã được sử dụng!</span>`;
-      isValidAccount.value = false;
-      userStore.user = null;
-    }
-  } else {
-    isValidAccount.value = false;
-
-    validateAccount.value.email = `<span class='text-danger fs-6'>Vui lòng nhập email!</span>`;
-  }
-
-  if (newAccount.value.confirmPassword) {
-    if (newAccount.value.confirmPassword != newAccount.value.password) {
-      validateAccount.value.confirmPassword = `<span class='text-danger fs-6'>Mật khẩu không khớp!</span>`;
-      isValidAccount.value = false;
-    }
-  } else {
-    isValidAccount.value = false;
-
-    validateAccount.value.confirmPassword = `<span class='text-danger fs-6'>Vui lòng xác nhận mật khẩu!</span>`;
-  }
-
-  if (newAccount.value.fullName.length < 5) {
-    isValidAccount.value = false;
-    validateAccount.value.fullName = `<span class='text-danger fs-6'>Vui lòng nhập tên lớn hơn 5 kí tự!</span>`;
-  }
-
-  if (newAccount.value.address.length < 20) {
-    isValidAccount.value = false;
-    validateAccount.value.address = `<span class='text-danger fs-6'>Vui lòng nhập địa chỉ lớn hơn 20 kí tự!</span>`;
-  }
-
-  if (newAccount.value.password.length < 5) {
-    isValidAccount.value = false;
-    validateAccount.value.password = `<span class='text-danger fs-6'>Vui lòng nhập mật khẩu lớn hơn 5 kí tự!</span>`;
-  }
-
-  if (isValidAccount.value) {
+const verifyOTP = async () => {
+  otpStore.otpMessage = `<span class="text-info">Đang kiểm tra mã OTP...</span>`;
+  await otpStore.validateOtp(newAccount.value.email, otp.value);
+  if (otpStore.isValidOtp) {
     await authStore.register(newAccount.value);
     router.push("/auth/login");
+  } else {
+    otpStore.otpMessage = `<span class="text-danger">Mã OTP không hợp lệ!</span>`;
   }
 };
 </script>
+
 <style scoped>
 .input-control-media {
   height: 50px;

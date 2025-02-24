@@ -2,10 +2,10 @@
   <div class="list-group shadow-sm rounded-0 h-100 bg-white">
     <div class="row border-bottom p-2">
       <div class="col-3">
-        <img :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1738852593/0GYFgvj_t6yp1z.jpg'" alt="User Avatar" class="img-fluid rounded-circle" style="height: 50px" />
+        <img :src="user?.photo" alt="User Avatar" class="img-fluid rounded-circle" style="height: 50px" />
       </div>
       <div class="col-9">
-        <span class="fw-bold">{{ username }}</span>
+        <span class="fw-bold">{{ user?.username }}</span>
         <p class="p-0 m-0">Tùy chọn <i class="bi bi-pencil-fill"></i></p>
       </div>
     </div>
@@ -165,11 +165,5 @@ const closeCheckingOtpModal = () => {
 
 onMounted(async () => {
   await useUserStores.fetchUserById(JSON.parse(localStorage.getItem("user")).id);
-});
-
-const props = defineProps({
-  username: {
-    type: String,
-  },
 });
 </script>

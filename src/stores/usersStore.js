@@ -207,6 +207,33 @@ export const useUsersStore = defineStore("users", () => {
     }
   };
 
+  const setProfilePhoto = async (id, photo) => {
+    isLoadingUserStores.value = true;
+    const formData = new URLSearchParams();
+    formData.append("photo", photo);
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/user/change-profile-photo/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+
+      if (response.ok) {
+        console.log("SET PROFILE PHOTO SUCCESS");
+        user.value.photo = photo;
+      } else {
+        console.log("SET PROFILE PHOTO FAILED", response);
+      }
+    } catch (err) {
+      console.log("ERROR WHEN SET PROFILE PHOTO: ", err.message);
+    } finally {
+      isLoadingUserStores.value = false;
+    }
+  };
+
   return {
     isLoadingUserStores,
     usersStoreError,
@@ -223,5 +250,6 @@ export const useUsersStore = defineStore("users", () => {
     fetchUserByUsername,
     fetchUserByPhone,
     fetchUserByEmail,
+    setProfilePhoto,
   };
 });

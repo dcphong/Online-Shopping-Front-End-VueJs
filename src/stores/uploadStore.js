@@ -7,7 +7,7 @@ export const useUploadStore = defineStore("upload", () => {
   const image = ref(null);
   const imageUrl = ref("");
   const apiUrl = import.meta.env.VITE_API_BASE_URL;
-
+  const uploadMessage = ref("");
   const uploadImage = async (file) => {
     if (!file) {
       uploadError.value = "Vui lòng chọn một tệp!";
@@ -29,6 +29,7 @@ export const useUploadStore = defineStore("upload", () => {
         const data = await response.json();
         image.value = data.data;
         imageUrl.value = image.value.secure_url;
+        uploadMessage.value = `<span class="text-success">Upload thành công!</span>`;
       } else {
         const data = await response.json();
         uploadError.value = data.message || "Upload failed!";
@@ -36,10 +37,11 @@ export const useUploadStore = defineStore("upload", () => {
     } catch (err) {
       console.log("ERROR:", err);
       uploadError.value = err.message;
+      uploadMessage.value = `<span class="text-danger">Upload không thành công!</span>`;
     } finally {
       isUpload.value = false;
     }
   };
 
-  return { isUpload, uploadError, uploadError, image, uploadImage, imageUrl };
+  return { isUpload, uploadError, image, uploadImage, imageUrl, uploadMessage };
 });

@@ -3,7 +3,7 @@
     <div class="row mb-3 m-0">
       <!-- Sidebar -->
       <div class="col-md-3 border-0 p-0">
-        <profile-side-bar :username="user?.username"></profile-side-bar>
+        <profile-side-bar></profile-side-bar>
       </div>
 
       <!-- Profile Form -->
@@ -45,14 +45,11 @@
 
             <!-- Avatar -->
             <div class="col-md-4 text-center">
-              <img
-                :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1738852593/0GYFgvj_t6yp1z.jpg'"
-                alt="User Avatar"
-                class="rounded-circle img-fluid border border-secondary p-1"
-                style="width: 120px; height: 120px; object-fit: cover"
-              />
+              <img :src="user?.photo" alt="User Avatar" class="rounded-circle img-fluid border border-secondary p-1" style="width: 120px; height: 120px; object-fit: cover" />
               <div class="mt-3">
-                <button class="btn btn-outline-secondary">Chọn Ảnh</button>
+                <input type="file" ref="fileInput" @change="handleFileChange" accept="image/*" class="d-none" />
+                <button class="btn btn-outline-secondary rounded-0" @click="triggerFileInput">Chọn Ảnh</button>
+                <span v-html="uploadMessage" class="text-info d-block"></span>
                 <p class="text-muted mt-2">Dụng lượng file tối đa 10MB. Định dạng: .JPEG, .PNG</p>
               </div>
             </div>
@@ -107,8 +104,12 @@ import Loading from "../../components/user/Loading.vue";
 import ProfileSideBar from "../../components/user/ProfileSideBar.vue";
 import { useUsersStore } from "../../stores/usersStore.js";
 
+import { useUploadStore } from "../../stores/uploadStore.js";
+const uploadStore = useUploadStore();
+const { isUpload, uploadMessage, uploadError, uploadImage, imageUrl } = storeToRefs(uploadStore);
+
 const useUserStores = useUsersStore();
-const { fetchUserById, user, isLoadingUserStores, updateProfile, userStoreMessage } = storeToRefs(useUserStores);
+const { fetchUserById, user, isLoadingUserStores, updateProfile, setProfilePhoto, userStoreMessage } = storeToRefs(useUserStores);
 
 const isOpenEditModal = ref(false);
 const maskedEmail = (email) => {
@@ -150,6 +151,23 @@ const doEditProfile = async () => {
   await nextTick();
   await useUserStores.updateProfile(useUserStores.user.id, newProfile.value);
 };
+
+const fileInput = ref(null);
+
+const triggerFileInput = () => {
+  fileInput.value.click();
+};
+
+const handleFileChange = async (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    await uploadStore.uploadImage(file);
+    if (uploadStore.imageUrl) {
+      await useUserStores.setProfilePhoto(useUserStores.user.id, uploadStore.imageUrl);
+    }
+  }
+};
+
 onMounted(async () => {
   await useUserStores.fetchUserById(JSON.parse(localStorage.getItem("user")).id);
 });

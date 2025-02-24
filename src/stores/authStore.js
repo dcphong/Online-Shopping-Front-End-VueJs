@@ -56,7 +56,6 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const register = async (data) => {
-    console.log("REGISTER API IS CALLED!");
     isLoading.value = true;
     try {
       const response = await fetch(`${apiUrl}/api/v1/auth/registry`, {

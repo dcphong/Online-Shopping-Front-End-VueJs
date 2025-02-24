@@ -56,7 +56,7 @@
                   </div>
                   <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product?.quantity || 1 }}</div>
                   <div class="col-2 d-flex align-items-center justify-content-end">
-                    {{ (product.discountPrice * product?.quantity).toLocaleString() || (product.discountPrice * 1).toLocaleString() }}đ
+                    {{ (product.discountPrice * (product.quantity == null ? 1 : product.quantity)).toLocaleString() || (product.discountPrice * 1).toLocaleString() }}đ
                   </div>
                 </template>
                 <template v-else>
@@ -88,8 +88,9 @@
               <div class="col-12 border m-0">
                 <div class="row m-0">
                   <div class="d-flex justify-content-end p-4">
-                    <span class="fw-bold"
-                      >Tống: <b class="fw-normal fs-6 text-danger">{{ formatNumber(shippingFee + groups?.totalPrice || totalPrice) + " đ" }}</b>
+                    <span class="fw-bold">
+                      Tống:
+                      <b class="fw-normal fs-6 text-danger">{{ formatNumber(shippingFee + groups?.totalPrice || totalPrice) + " đ" }} </b>
                     </span>
                   </div>
                 </div>
@@ -196,16 +197,17 @@ const groupedProductsBySaler = computed(() => {
       };
     }
     groups[sellerId].products.push(product);
-    groups[sellerId].totalPrice += product.discountPrice > 0 ? product.discountPrice * product.quantity : product.price * product.quantity;
+    groups[sellerId].totalPrice += product.discountPrice > 0 ? product.discountPrice * (product.quantity || 1) : product.price * (product.quantity || 1);
+
     return groups;
   }, {});
 });
 
 const totalProductPrice = computed(() => {
-  if (selectedProducts.length <= 1) {
-    return selectedProducts.reduce((sum, product) => sum + product.price * 1, 0);
-  }
-  return Object.values(groupedProductsBySaler.value).reduce((sum, group) => sum + group?.totalPrice, 0);
+  return selectedProducts.reduce((sum, product) => {
+    const price = product.discountPrice > 0 ? product.discountPrice : product.price;
+    return sum + price * (product.quantity || 1);
+  }, 0);
 });
 
 const totalShippingFee = computed(() => {
