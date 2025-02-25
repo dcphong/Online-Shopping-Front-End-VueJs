@@ -86,6 +86,12 @@ const adminRoutes = {
       meta: { title: "Trang upload" },
       component: () => import("../components/admin/UploadManagement.vue"),
     },
+    {
+      path: "orders",
+      name: "AdminOrdersManagement",
+      meta: { title: "Quản lý đơn hàng" },
+      component: () => import("../components/admin/OrdersManagement.vue"),
+    },
   ],
 };
 const authRoutes = {

@@ -50,16 +50,8 @@ export const useUsersStore = defineStore("users", () => {
   const fetchUserByUsername = async (username) => {
     isLoadingUserStores.value = true;
     usersStoreError.value = null;
-    const formData = new URLSearchParams();
-    formData.append("username", username);
     try {
-      const response = await fetch(`${apiUrl}/api/v1/users/search/username`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-      });
+      const response = await fetch(`${apiUrl}/api/v1/users/search/username?username=${encodeURIComponent(username)}`);
       if (response.ok) {
         const data = await response.json();
         user.value = data.data;
@@ -73,21 +65,15 @@ export const useUsersStore = defineStore("users", () => {
     }
   };
   const fetchUserByPhone = async (phone) => {
+    console.log("PHONE:", phone);
     isLoadingUserStores.value = true;
     usersStoreError.value = null;
-    const formData = new URLSearchParams();
-    formData.append("phone", phone);
     try {
-      const response = await fetch(`${apiUrl}/api/v1/users/search/phone`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-      });
+      const response = await fetch(`${apiUrl}/api/v1/users/search/phone?phone=${encodeURIComponent(phone)}`);
       if (response.ok) {
         const data = await response.json();
         user.value = data.data;
+        console.log("USER PHONE VALUE:", user.value);
       } else {
         usersStoreError.value = "Failed to fetch user with phone: " + phone;
       }
@@ -99,21 +85,15 @@ export const useUsersStore = defineStore("users", () => {
   };
 
   const fetchUserByEmail = async (email) => {
+    console.log("EMAIL:", email);
     isLoadingUserStores.value = true;
     usersStoreError.value = null;
-    const formData = new URLSearchParams();
-    formData.append("email", email);
     try {
-      const response = await fetch(`${apiUrl}/api/v1/users/search/email`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: formData.toString(),
-      });
+      const response = await fetch(`${apiUrl}/api/v1/users/search/email?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         user.value = data.data;
+        console.log("USER EMAIL VALUE:", user.value);
       } else {
         usersStoreError.value = "Failed to fetch user with email: " + email;
       }
@@ -207,6 +187,30 @@ export const useUsersStore = defineStore("users", () => {
     }
   };
 
+  const changePasswordByForgetPassword = async (id, password) => {
+    isChangingPassword.value = true;
+    const formData = new URLSearchParams();
+    formData.append("password", password);
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/forget-password/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: formData.toString(),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        userStoreMessage.value = `<span class='text-success'>${data.message}</span>`;
+      }
+    } catch (err) {
+      console.log("ERROR WHEN CHANGE PASSWORD BY FORGET PASSWORD: ", err.message);
+      userStoreMessage.value = `<span class='text-danger'>Đã có lỗi xảy ra vui lòng thử lại sau!</span>`;
+    } finally {
+      isChangingPassword.value = false;
+    }
+  };
+
   const setProfilePhoto = async (id, photo) => {
     isLoadingUserStores.value = true;
     const formData = new URLSearchParams();
@@ -246,6 +250,7 @@ export const useUsersStore = defineStore("users", () => {
     checkStatusMessage,
     checkValidPasswordNewChange,
     changePassword,
+    changePasswordByForgetPassword,
     isChangingPassword,
     fetchUserByUsername,
     fetchUserByPhone,

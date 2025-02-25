@@ -8,7 +8,7 @@
         <div class="mb-3">
           <input type="password" v-model="userLogin.password" placeholder="Nhập mật khẩu" class="form-control input-control-media" />
         </div>
-        <span v-if="error" class="text-danger fs-6" v-html="error"></span>
+        <span v-if="handleMessage" class="text-danger fs-6" v-html="handleMessage"></span>
         <div class="d-flex justify-content-between justify-content-center gap-2 mb-2">
           <button class="btn btn-outline-primary w-100 input-control-media" @click="handlerLogin()">Đăng nhập</button>
         </div>
@@ -36,8 +36,10 @@ const userLogin = ref({
 });
 const authStore = useAuthStore();
 const { login, user, error } = storeToRefs(authStore);
+const handleMessage = ref("");
+
 const handlerLogin = async () => {
-  error.value = `<span class='text-info fs-6'>Đang đăng nhập...</span>`;
+  handleMessage.value = `<span class='text-info fs-6'>Đang đăng nhập...</span>`;
   await nextTick();
   await authStore.login(userLogin.value.username, userLogin.value.password);
 };

@@ -2,7 +2,7 @@
   <div class="list-group shadow-sm rounded-0 h-100 bg-white">
     <div class="row border-bottom p-2">
       <div class="col-3">
-        <img :src="user?.photo" alt="User Avatar" class="img-fluid rounded-circle" style="height: 50px" />
+        <img :src="user?.photo" alt="User Avatar" class="img-fluid object-fit-cover rounded-circle" style="width: 50px; height: 50px" />
       </div>
       <div class="col-9">
         <span class="fw-bold">{{ user?.username }}</span>

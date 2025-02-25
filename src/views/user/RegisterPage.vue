@@ -107,15 +107,14 @@ const validateAccount = ref({
 
 const validateInput = async () => {
   let isValid = true;
-  validateAccount.value = {}; // Reset lỗi
-
-  // Gửi request lấy dữ liệu người dùng song song
+  validateAccount.value = {};
+  console.log(newAccount.value);
   await Promise.all([userStore.fetchUserByUsername(newAccount.value.username), userStore.fetchUserByPhone(newAccount.value.phone), userStore.fetchUserByEmail(newAccount.value.email)]);
 
   if (!newAccount.value.username) {
     validateAccount.value.username = "Vui lòng nhập username!";
     isValid = false;
-  } else if (userStore.user && userStore.user.username === newAccount.value.username) {
+  } else if (userStore.user.username === newAccount.value.username) {
     validateAccount.value.username = "Username đã tồn tại!";
     isValid = false;
   }
@@ -123,7 +122,7 @@ const validateInput = async () => {
   if (!newAccount.value.phone) {
     validateAccount.value.phone = "Vui lòng nhập số điện thoại!";
     isValid = false;
-  } else if (userStore.user && userStore.user.phone === newAccount.value.phone) {
+  } else if (userStore.user.phone === newAccount.value.phone) {
     validateAccount.value.phone = "Số điện thoại đã được sử dụng!";
     isValid = false;
   }
@@ -131,7 +130,7 @@ const validateInput = async () => {
   if (!newAccount.value.email) {
     validateAccount.value.email = "Vui lòng nhập email!";
     isValid = false;
-  } else if (userStore.user && userStore.user.email === newAccount.value.email) {
+  } else if (userStore.user.email === newAccount.value.email) {
     validateAccount.value.email = "Email đã được sử dụng!";
     isValid = false;
   }

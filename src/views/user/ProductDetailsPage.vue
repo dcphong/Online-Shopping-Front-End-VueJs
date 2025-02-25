@@ -33,7 +33,10 @@
                 <h3 class="text-danger d-inline fs-3">{{ product.price.toLocaleString() }} VNĐ</h3>
               </div>
 
-              <p class="card-text text-muted">Ngày bán: {{ dateAfterFormated }} - Người bán: {{ sellerName }}</p>
+              <p class="card-text text-muted mt-2">
+                Ngày bán: {{ dateAfterFormated }} - Người bán: {{ sellerName }}
+                <img :src="user.photo" class="img-fluid rounded-circle object-fit-cover" style="width: 50px; height: 50px" alt="" />
+              </p>
               <p class="card-text" v-if="product.categoryName">Loại sản phẩm: {{ product.categoryName }}</p>
               <p class="card-text" v-else>Danh mục: Chưa cập nhật</p>
               <p class="fw-bold" :class="{ 'text-success': product.available, 'text-danger': !product.available }">

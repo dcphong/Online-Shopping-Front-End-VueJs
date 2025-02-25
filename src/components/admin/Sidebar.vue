@@ -10,6 +10,9 @@
         <li class="nav-item">
           <router-link class="nav-link text-light" :to="'/admin/products'"> <i class="bi bi-box"></i> <span v-if="isOpen">Sản phẩm</span> </router-link>
         </li>
+        <li class="nav-item">
+          <router-link class="nav-link text-light" :to="'/admin/orders'"><i class="bi bi-receipt"></i> <span v-if="isOpen">Đơn hàng</span> </router-link>
+        </li>
         <li class="nav-item" v-if="isRoleAdmin">
           <router-link class="nav-link text-light" :to="'/admin/users'"> <i class="bi bi-people"></i> <span v-if="isOpen">Khách hàng</span> </router-link>
         </li>
