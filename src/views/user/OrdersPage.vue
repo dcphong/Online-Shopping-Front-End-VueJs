@@ -111,7 +111,8 @@ import ProfileSideBar from "../../components/user/ProfileSideBar.vue";
 import { useOrderDetails } from "../../stores/useOrderDetailsStore.js";
 import { useOrder } from "../../stores/useOrderStore.js";
 
-const { orders, order, isOrdersLoading, ordersError, fetchOrderById, fetchOrderByUserId } = useOrder();
+const orderStore = useOrder();
+const { orders, order, isOrdersLoading, ordersError, fetchOrderById, fetchOrderByUserId } = storeToRefs(orderStore);
 
 const orderDetailsStore = useOrderDetails();
 const { orderDetails, groupOrderDetailsByOrderId } = storeToRefs(orderDetailsStore);
@@ -152,7 +153,7 @@ const fetchOrderDetails = async (id) => {
 onMounted(async () => {
   user.value = await JSON.parse(localStorage.getItem("user"));
   if (user.value) {
-    await fetchOrderByUserId(user.value.id);
+    await orderStore.fetchOrderByUserId(user.value.id);
   }
 });
 </script>

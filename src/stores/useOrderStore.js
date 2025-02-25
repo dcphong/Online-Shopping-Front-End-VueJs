@@ -1,6 +1,8 @@
+import { defineStore } from "pinia";
 import { ref } from "vue";
-export const useOrder = () => {
+export const useOrder = defineStore("orderedStore", () => {
   const orders = ref([]);
+  const orderedList = ref([]);
   const orderStore = ref({});
   const isOrdersLoading = ref(false);
   const ordersError = ref(null);
@@ -105,5 +107,28 @@ export const useOrder = () => {
     }
   };
 
-  return { orders, orderStore, isOrdersLoading, ordersError, fetchOrders, fetchOrderById, fetchOrderByUserId, createdOrder };
-};
+  const fetchOrderedBySalerId = async (id) => {
+    isOrdersLoading.value = true;
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/user/orders/ordered/${id}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        orderedList.value = data.data;
+      }
+    } catch (err) {
+      ordersError.value = err.message;
+      console.log("Error: ", err.message);
+    } finally {
+      isOrdersLoading.value = false;
+    }
+  };
+
+  return { orders, orderStore, isOrdersLoading, orderedList, ordersError, fetchOrders, fetchOrderById, fetchOrderByUserId, createdOrder, fetchOrderedBySalerId };
+});

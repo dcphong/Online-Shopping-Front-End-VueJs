@@ -40,8 +40,11 @@ const handleMessage = ref("");
 
 const handlerLogin = async () => {
   handleMessage.value = `<span class='text-info fs-6'>Đang đăng nhập...</span>`;
-  await nextTick();
   await authStore.login(userLogin.value.username, userLogin.value.password);
+  await nextTick();
+  if (error.value) {
+    handleMessage.value = `<span class='text-danger fs-6'>${error.value}</span>`;
+  }
 };
 
 const route = useRoute();

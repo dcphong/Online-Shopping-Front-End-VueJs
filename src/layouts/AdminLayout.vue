@@ -1,6 +1,6 @@
 <template>
   <div>
-    <Header :inforAddress="router.meta.title"></Header>
+    <Header :inforAddress="router.meta.title" :photo="user.photo"></Header>
     <div class="d-flex">
       <Sidebar></Sidebar>
       <div class="content m-0 p-0">
@@ -12,10 +12,23 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
+import { onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import Footer from "../components/admin/Footer.vue";
 import Header from "../components/admin/Header.vue";
 import Sidebar from "../components/admin/Sidebar.vue";
+import { useUsersStore } from "../stores/usersStore";
+const userStores = useUsersStore();
+const { user, fetchUserById } = storeToRefs(userStores);
+
+const photo = ref("");
+
+onMounted(async () => {
+  photo.value = JSON.parse(localStorage.getItem("user")).photo;
+  const userId = JSON.parse(localStorage.getItem("user")).id;
+  await userStores.fetchUserById(userId);
+});
 
 const router = useRoute();
 </script>

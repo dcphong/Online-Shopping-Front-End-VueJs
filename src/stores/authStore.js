@@ -1,7 +1,7 @@
 import { jwtDecode } from "jwt-decode";
 
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useProductsInCart } from "../composables/useProductInCart";
 
@@ -45,6 +45,7 @@ export const useAuthStore = defineStore("auth", () => {
         decodeUserRole();
         user.value = JSON.parse(localStorage.getItem("user"));
         router.push(router.currentRoute.value.query.redirect || "/");
+        await nextTick();
       } else if (response.status == 403) {
         error.value = `<span class='text-danger fs-6'>Tài khoảng hoặc mật khẩu không chính xác</span>`;
       }

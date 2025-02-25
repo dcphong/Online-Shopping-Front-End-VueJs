@@ -10,11 +10,15 @@ export const useUsersStore = defineStore("users", () => {
   const userStoreMessage = ref("");
   const checkStatusMessage = ref("");
   const isChangingPassword = ref(false);
-  const fetchAllUsers = async () => {
+  const fetchAllUsers = async (role, page, size, key, direction) => {
     isLoadingUserStores.value = true;
     usersStoreError.value = null;
+    if (role == 0) role = "";
+    else if (role == 1) role = "ROLE_USER";
+    else if (role == 2) role = "ROLE_ADMIN";
+    else if (role == 3) role = "ROLE_MANAGER";
     try {
-      const response = await fetch(apiUrl + "/api/v1/users");
+      const response = await fetch(`${apiUrl}/api/v1/users?role=${role}&page=${page}&size=${size}&key=${key}&direction=${direction}`);
       if (response.ok) {
         const data = await response.json();
         users.value = data.data;
@@ -211,6 +215,23 @@ export const useUsersStore = defineStore("users", () => {
     }
   };
 
+  const changeUserAvailableStatus = async (id) => {
+    isLoadingUserStores.value = true;
+    try {
+      await fetch(`${apiUrl}/api/v1/admin/user/locked/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      console.log("ERROR WHEN CHANGE USER STATUS: ", err.message);
+    } finally {
+      isLoadingUserStores.value = false;
+    }
+  };
+
   const setProfilePhoto = async (id, photo) => {
     isLoadingUserStores.value = true;
     const formData = new URLSearchParams();
@@ -256,5 +277,6 @@ export const useUsersStore = defineStore("users", () => {
     fetchUserByPhone,
     fetchUserByEmail,
     setProfilePhoto,
+    changeUserAvailableStatus,
   };
 });

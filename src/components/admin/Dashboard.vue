@@ -125,7 +125,7 @@
               <tr v-for="product in products.slice(0, 5)" :key="product.id">
                 <td>{{ product.id }}</td>
                 <td>
-                  <img :src="product.image" alt="Product Image" class="img-thumbnail" style="width: 50px; height: 50px" />
+                  <img :src="product.image" alt="Product Image" class="img-thumbnail object-fit-cover" style="width: 50px; height: 50px" />
                 </td>
                 <td>{{ product.name }}</td>
                 <td>${{ product.price.toFixed(2) }}</td>
@@ -171,111 +171,6 @@
         </div>
       </div>
     </div>
-    <template v-if="isRoleAdmin">
-      <div class="card mt-3">
-        <div class="card-header">Danh Sách Người dùng</div>
-        <div class="card-body">
-          <table class="table table-hover align-middle">
-            <thead class="table-light">
-              <tr>
-                <th>ID</th>
-                <th>AVATAR</th>
-                <th>USERNAME</th>
-                <th>FULLNAME</th>
-                <th>SĐT</th>
-                <th>EMAIL</th>
-                <th>VAI TRÒ</th>
-                <th>TRẠNG THÁI</th>
-              </tr>
-            </thead>
-            <tbody>
-              <template v-if="isLoading">
-                <tr v-for="n in 5" :key="n">
-                  <td>
-                    <span class="placeholder col-6"></span>
-                  </td>
-                  <td>
-                    <span class="d-block rounded bg-secondary placeholder-wave" style="width: 50px; height: 50px"></span>
-                  </td>
-                  <td>
-                    <span class="placeholder col-8"></span>
-                  </td>
-                  <td>
-                    <span class="placeholder col-6"></span>
-                  </td>
-                  <td>
-                    <span class="placeholder col-6"></span>
-                  </td>
-                  <td>
-                    <span class="placeholder col-4"></span>
-                  </td>
-                  <td>
-                    <span class="placeholder col-4"></span>
-                  </td>
-                  <td>
-                    <span class="placeholder col-7"></span>
-                  </td>
-                </tr>
-              </template>
-
-              <template v-else-if="!users">
-                <tr>
-                  <td colspan="8" class="text-center text-warning fw-bold">EMPTY DATA</td>
-                </tr>
-              </template>
-              <template v-else>
-                <tr v-for="user in users" :key="user.id">
-                  <td>{{ user.id }}</td>
-                  <td>
-                    <img
-                      :src="'https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1738852593/0GYFgvj_t6yp1z.jpg'"
-                      alt="User Image"
-                      class="rounded-circle"
-                      style="width: 50px; height: 50px"
-                    />
-                  </td>
-                  <td>{{ user.username }}</td>
-                  <td>{{ user.fullName }}</td>
-                  <td>{{ user.phone }}</td>
-                  <td>{{ user.email }}</td>
-                  <td>{{ user.roles.includes("ROLE_USER") ? "Khách hàng" : user.roles.includes("ROLE_ADMIN") ? "Quản Trị" : "Quản Lý" }}</td>
-                  <td>{{ user.available ? "Hoạt động" : "Khóa" }}</td>
-                </tr>
-              </template>
-            </tbody>
-          </table>
-          <div class="d-flex justify-content-center">
-            <nav aria-label="Page navigation example">
-              <ul class="pagination justify-content-center">
-                <li class="page-item disabled">
-                  <a class="page-link">
-                    <i class="bi bi-rewind-fill"></i>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link">
-                    <i class="bi bi-caret-left-fill"></i>
-                  </a>
-                </li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item">
-                  <a class="page-link" href="#">
-                    <i class="bi bi-caret-right-fill"></i>
-                  </a>
-                </li>
-                <li class="page-item">
-                  <a class="page-link" href="#">
-                    <i class="bi bi-fast-forward-fill"></i>
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </template>
   </div>
 </template>
 
@@ -289,8 +184,6 @@ const { isRoleAdmin, isRoleUser } = useAuthStore();
 
 const useProductsStore = useProducts();
 const { products, loading, error, fetchProductByUserId } = storeToRefs(useProductsStore);
-const useUsersStores = useUsersStore();
-const { isLoading, users, fetchAllUsers, fetchUserById } = storeToRefs(useUsersStores);
 
 const totalProducts = computed(() => useProductsStore.products.length);
 const availableProducts = computed(() => products.value.filter((p) => p.available && p.stock_quantity > 0).length);
@@ -299,9 +192,6 @@ const discountedProducts = computed(() => products.value.filter((p) => p.discoun
 
 onMounted(async () => {
   await useProductsStore.fetchProductByUserId(JSON.parse(localStorage.getItem("user")).id);
-  if (!users.length) {
-    await useUsersStores.fetchAllUsers();
-  }
 });
 </script>
 

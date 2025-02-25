@@ -7,7 +7,7 @@
 
       <div v-if="uploadError" class="alert alert-danger">{{ uploadError }}</div>
 
-      <img :src="imagePreview" alt="Uploaded Image" class="img-thumbnail" />
+      <img :src="imagePreview" alt="Uploaded Image" class="img-thumbnail" style="max-width: 200px" />
     </div>
   </div>
 </template>

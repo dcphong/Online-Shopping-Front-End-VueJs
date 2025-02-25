@@ -77,7 +77,7 @@ const adminRoutes = {
     {
       path: "users",
       name: "AdminUsers",
-      meta: { title: "Trang quản trị" },
+      meta: { title: "Trang quản trị người dùng" },
       component: () => import("../components/admin/UsersManagement.vue"),
     },
     {

@@ -48,7 +48,7 @@
             <!-- Dropdown người dùng -->
             <li class="nav-item dropdown">
               <button class="nav-link btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://res.cloudinary.com/sof3022-image-cloudinary/image/upload/v1738852593/0GYFgvj_t6yp1z.jpg" alt="" class="rounded-circle" width="30" height="30" />
+                <img :src="photo" alt="" class="rounded-circle object-fit-cover" width="30" height="30" />
               </button>
 
               <ul class="dropdown-menu dropdown-menu-end m-0">
@@ -77,6 +77,7 @@ onMounted(async () => {
 
 const props = defineProps({
   inforAddress: String,
+  photo: String,
 });
 </script>
 

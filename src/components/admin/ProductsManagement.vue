@@ -35,7 +35,7 @@
         <tr v-for="(product, index) in products" :key="product.id" @click="handleEditProduct(product.id)">
           <td>{{ index }}</td>
           <td>
-            <img :src="product.image" class="" style="width: 70px" alt="" />
+            <img :src="product.image" class="object-fit-cover" style="width: 70px; height: 70px" alt="" />
           </td>
           <td class="product-name-table">{{ product.name.length > 30 ? product.name.slice(0, 70) + "..." : product.name }}</td>
           <td class="text-center">{{ product.price }} VNĐ</td>
