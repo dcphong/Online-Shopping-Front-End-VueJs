@@ -25,5 +25,5 @@ export const useCategoryStore = defineStore("category", () => {
     }
   };
 
-  return { categories, isCategoriesLoading, categoriesErrorr, category, apiUrl, fetchCategories };
+  return { categories, isCategoriesLoading, categoriesErrorr, category, fetchCategories };
 });

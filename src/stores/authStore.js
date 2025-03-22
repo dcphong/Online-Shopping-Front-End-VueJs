@@ -104,16 +104,11 @@ export const useAuthStore = defineStore("auth", () => {
 
     try {
       const decodeToken = jwtDecode(accessToken.value);
-      role.value = decodeToken.roles;
-      if (role.value.includes("ROLE_ADMIN")) {
-        isRoleAdmin.value = true;
-      }
-      if (role.value.includes("ROLE_USER")) {
-        isRoleUser.value = true;
-      }
-      if (role.value.includes("ROLE_MANAGER")) {
-        isRoleManager.value = true;
-      }
+      role.value = decodeToken.roles || [];
+
+      isRoleAdmin.value = role.value.includes("ROLE_ADMIN");
+      isRoleUser.value = role.value.includes("ROLE_USER");
+      isRoleManager.value = role.value.includes("ROLE_MANAGER");
     } catch (error) {
       console.error("Lỗi khi giải mã JWT:", error);
       logout();
@@ -143,7 +138,10 @@ export const useAuthStore = defineStore("auth", () => {
 
   const initAuth = async () => {
     const userInLocal = JSON.parse(localStorage.getItem("user"));
-    await isTokenExpired(accessToken.value);
+    if (accessToken.value) {
+      await isTokenExpired(accessToken.value);
+    }
+
     if (userInLocal && !isExpiredToken.value) {
       user.value = userInLocal;
       decodeUserRole();

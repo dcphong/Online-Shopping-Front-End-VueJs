@@ -15,21 +15,21 @@
           <div class="navbar-nav w-100">
             <router-link to="/" class="nav-link hover-effect fs-5 text-truncate">Trang chủ</router-link>
 
-            <div class="dropdown">
+            <!-- <div class="dropdown">
               <button class="nav-link hover-effect dropdown-toggle m-0" data-bs-toggle="dropdown">Loại sản phẩm</button>
               <ul class="dropdown-menu dropdown-menu-dark rounded-0 rounded-bottom-1 m-0">
-                <li>
-                  <routerLink to="search" class="dropdown-item">Điện tử</routerLink>
-                  <routerLink to="search" class="dropdown-item">Lap top</routerLink>
-                  <routerLink to="search" class="dropdown-item">Thời trang</routerLink>
+                <li v-for="category in categories" :key="category.id">
+                  <template>
+                    <routerLink to="/search" class="dropdown-item">{{ category?.name }}</routerLink>
+                  </template>
                 </li>
               </ul>
-            </div>
+            </div> -->
             <router-link to="/admin" class="nav-link admin-link-redirect fs-6 text-truncate">Kênh quản trị</router-link>
 
             <!-- SEARCH -->
             <div class="d-flex search w-50 ms-auto">
-              <input class="form-control rounded-end-0 inputSearch" id="search" v-model="searchValue" name="search" type="search" placeholder="Nhập từ khóa..." required />
+              <input class="form-control rounded-end-0 inputSearch" id="search" v-model="searchValue" name="search" type="search" placeholder="Nhập từ khóa..." required autocomplete="off" />
               <button @click="search" class="btn btn-outline-success rounded-start-0 inputSearch btnSearch text-truncate">Tìm kiếm</button>
             </div>
             <!-- END SEARCH -->
@@ -89,11 +89,17 @@
 </template>
 
 <script setup>
-import { inject, onMounted, reactive, ref, watchEffect } from "vue";
+import { storeToRefs } from "pinia";
+import { nextTick, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useProductsInCart } from "../../composables/useProductInCart";
 import { useAuthStore } from "../../stores/authStore";
-const { productsInCartNumber, cart } = useProductsInCart();
+import { useCategoryStore } from "../../stores/categoryStore";
+
+const categoryStore = useCategoryStore();
+const { fetchCategories, categories } = storeToRefs(categoryStore);
+const productInCart = useProductsInCart();
+const { productsInCartNumber, cart } = storeToRefs(productInCart);
 const { logout, user } = useAuthStore();
 const router = useRouter();
 const route = useRoute();
@@ -108,6 +114,11 @@ const search = () => {
     router.push({ path: "/search", query: { search: searchValue.value } });
   }
 };
+
+onMounted(async () => {
+  await categoryStore.fetchCategories();
+  await nextTick();
+});
 </script>
 
 <style>

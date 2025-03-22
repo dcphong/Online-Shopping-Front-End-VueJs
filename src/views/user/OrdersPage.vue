@@ -49,8 +49,8 @@
 
         <!-- Modal Chi Tiết Đơn Hàng -->
         <teleport to="body"
-          ><div class="modal fade modal-xl" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
+          ><div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-fullscreen">
               <div class="modal-content">
                 <div class="modal-header">
                   <h5 class="modal-title" id="detailsModalLabel">Chi tiết đơn hàng</h5>

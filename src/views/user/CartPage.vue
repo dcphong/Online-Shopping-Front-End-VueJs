@@ -78,6 +78,7 @@
 </template>
 
 <script setup>
+import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useProductsInCart } from "../../composables/useProductInCart.js";
@@ -85,10 +86,12 @@ import { useCartStore } from "../../stores/cartStore.js";
 
 const router = useRouter();
 const { setSelectedProducts } = useCartStore();
-const { loading, error, removeProductInCart, removeAllProductsInCart, cart } = useProductsInCart();
+
+const cartStore = useProductsInCart();
+const { loading, error, removeProductInCart, removeAllProductsInCart, cart } = storeToRefs(cartStore);
 
 const groupedCartItems = computed(() => {
-  return cart.items.reduce((groups, product) => {
+  return cartStore.cart.items.reduce((groups, product) => {
     const sellerId = product.createdBy;
     const salerFullname = product.userCreatedName;
     if (!groups[sellerId]) {
@@ -102,8 +105,9 @@ const groupedCartItems = computed(() => {
     return groups;
   }, {});
 });
+
 const removeAllProductsBySeller = (sellerId) => {
-  cart.items = cart.items.filter((product) => product.createdBy !== sellerId);
+  cartStore.cart.items = cartStore.cart.items.filter((product) => product.createdBy !== sellerId);
 };
 
 const sendProductsToPayment = (products) => {

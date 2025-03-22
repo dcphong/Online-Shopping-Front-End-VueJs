@@ -130,7 +130,7 @@ export const useUsersStore = defineStore("users", () => {
       userStoreMessage.value = "<span class='text-danger'>Đã xảy ra lỗi khi cập nhật t thông tin! </span>";
     } finally {
       isLoadingUserStores.value = false;
-      userStoreMessage.value = "<span class='text-sucess'>Cập nhật thông tin thành công!</span>";
+      userStoreMessage.value = "<span class='text-success'>Cập nhật thông tin thành công!</span>";
     }
   };
 

@@ -39,7 +39,7 @@
       <div class="mt-3 text-center">
         <span>Đã có tài khoản?</span>
         <router-link to="/auth/login" class="text-decoration-underline text-info"> Đăng nhập ngay</router-link>
-        <div class="mt-1" v-html="authMessage + '...'"></div>
+        <div class="mt-1" v-html="authMessage"></div>
       </div>
     </form>
     <teleport to="body">

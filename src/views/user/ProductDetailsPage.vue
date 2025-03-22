@@ -42,8 +42,10 @@
               <p class="fw-bold" :class="{ 'text-success': product.available, 'text-danger': !product.available }">
                 {{ product.available ? "Còn hàng" : "Hết hàng" }}
               </p>
-              <button :class="{ disabled: !product.available }" class="btn btn-primary w-50 rounded-0" @click="showModal(product)">{{ product.available ? "Thêm vào giỏ hàng" : "Hết hàng" }}</button>
-              <button v-if="product.available" @click="buy(product)" class="btn btn-success ms-2 w-25 rounded-0">{{ product.available ? "Mua ngay" : "Hết hàng" }}</button>
+              <button :class="{ disabled: product.stock_quantity <= 0 }" class="btn btn-primary w-50 rounded-0" @click="showModal(product)">
+                {{ product.available ? "Thêm vào giỏ hàng" : "Hết hàng" }}
+              </button>
+              <button @click="buy(product)" :disabled="product.stock_quantity <= 0" class="btn btn-success ms-2 w-25 rounded-0">{{ product.stock_quantity > 0 ? "Mua ngay" : "Hết hàng" }}</button>
             </div>
           </div>
         </div>

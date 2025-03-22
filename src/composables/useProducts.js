@@ -8,9 +8,10 @@ export const useProducts = defineStore("products", () => {
   const isAddProduct = ref(false);
   const productStoreMessage = ref("");
   const error = ref(null);
-  const apiUrl = import.meta.env.VITE_API_BASE_URL;
+  const apiUrl = import.meta.env.VITE_API_BASE_URL; //localhost:8080
   const isNotFoundKeyword = ref(false);
   // Fetch all products
+
   const fetchProducts = async () => {
     loading.value = true;
     error.value = null;
@@ -167,6 +168,22 @@ export const useProducts = defineStore("products", () => {
     }
   };
 
+  const fetchProductsByCategory = async (category) => {
+    loading.value = true;
+
+    try {
+      const response = await fetch(`${apiUrl}/api/v1/product/category?=${encodeURIComponent(category)}`);
+      if (response.ok) {
+        const data = await response.json();
+        products.value = data.data;
+      }
+    } catch (err) {
+      console.log("USE PRODUCT STORE ERROR: ", err.message);
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     products,
     product,
@@ -183,5 +200,6 @@ export const useProducts = defineStore("products", () => {
     deleteProduct,
     fetchProductByKeyWords,
     isNotFoundKeyword,
+    fetchProductsByCategory,
   };
 });
