@@ -82,7 +82,7 @@
               </div>
             </div>
             <div class="float-end">
-              <span v-html="userStoreMessage"></span>
+              <span class="me-2" v-html="userStoreMessage"></span>
               <button class="btn btn-warning rounded-0">Cập nhật</button>
             </div>
           </form>
@@ -160,6 +160,7 @@ const triggerFileInput = () => {
 
 const handleFileChange = async (event) => {
   const file = event.target.files[0];
+  uploadStore.uploadMessage = `<span class='text-primary badge rounded-0'>Đang xử lý hình ảnh...</span>`;
   if (file) {
     await uploadStore.uploadImage(file);
     if (uploadStore.imageUrl) {

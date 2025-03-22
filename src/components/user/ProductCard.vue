@@ -25,13 +25,13 @@
       </p>
       <p v-else class="card-price text-orange float-start fs-6 fw-normal float-start">đ{{ product.price.toLocaleString() }}</p>
 
-      <button v-if="product.available" @click="showModal(product.name, product.price)" class="btn btn-sm btn-outline-primary w-100">
+      <button v-if="product.stock_quantity > 0" @click="showModal(product.name, product.price)" class="btn btn-sm btn-outline-primary w-100">
         Thêm vào giỏ hàng
         <!-- ICON ADD TO CART -->
         <i class="bi bi-bag-plus-fill"></i>
         <!-- END ICON ADD TO CART -->
       </button>
-      <button v-else class="btn btn-sm btn-outline-dark w-100" :disabled="!product.available">
+      <button v-else class="btn btn-sm btn-outline-dark w-100" :disabled="product.stock_quantity <= 0">
         Hết hàng
         <!-- ICON OUT OF STOCK -->
         <i class="bi bi-bag-x-fill"></i>

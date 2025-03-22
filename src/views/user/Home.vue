@@ -68,7 +68,9 @@ import { useProducts } from "../../composables/useProducts.js";
 
 const useProductStore = useProducts();
 const { products, loading, error, fetchProducts, getProductsByCategoryName } = storeToRefs(useProductStore);
-const { addToCart } = useProductsInCart();
+
+const productInCart = useProductsInCart();
+const { addToCart } = storeToRefs(productInCart);
 
 const productElectronics = ref(null);
 
@@ -80,9 +82,9 @@ onMounted(async () => {
 const showToast = ref(false);
 const currentProduct = ref(null);
 
-const handleAddToCart = (product) => {
+const handleAddToCart = async (product) => {
   currentProduct.value = product;
-  addToCart(product);
+  productInCart.addToCart(product);
   showToast.value = true;
 };
 </script>

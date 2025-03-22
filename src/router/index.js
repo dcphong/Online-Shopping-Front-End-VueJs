@@ -120,6 +120,6 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach(useAuthGuard);
+router.beforeEach((to, from, next) => useAuthGuard(to, from, next));
 
 export default router;

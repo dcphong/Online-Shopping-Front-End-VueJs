@@ -137,7 +137,7 @@ const last = async () => {
   await userStores.fetchAllUsers(role.value, userStores.users.totalPages - 1, 5, "username", "asc");
 };
 const first = async () => {
-  await userStores.fetchAllUsers(role.value, 0, 0, 5, "username", "asc");
+  await userStores.fetchAllUsers(role.value, 0, 5, "username", "asc");
 };
 const handleComputedPage = async (page) => {
   await userStores.fetchAllUsers(role.value, page, 5, "username", "asc");

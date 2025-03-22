@@ -62,7 +62,9 @@
                 <template v-else>
                   <div class="col-2 d-flex align-items-center justify-content-end">{{ product.price.toLocaleString() }}đ</div>
                   <div class="col-2 d-flex align-items-center justify-content-end" v-bind="product.quantity">{{ product?.quantity || 1 }}</div>
-                  <div class="col-2 d-flex align-items-center justify-content-end">{{ (product.price * product?.quantity).toLocaleString() || (product.price * 1).toLocaleString() }}đ</div>
+                  <div class="col-2 d-flex align-items-center justify-content-end">
+                    {{ product.quantity != null ? (product.price * product?.quantity).toLocaleString() : (product.price * 1).toLocaleString() }}đ
+                  </div>
                 </template>
               </div>
 
